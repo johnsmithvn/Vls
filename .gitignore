@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+__pycache__/
+*.pyc
+.venv/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Build
+.next/
+out/
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log
+
+# Python
+*.egg
+.eggs/
+.mypy_cache/
+.ruff_cache/
+
+# Artifacts
+_archived/

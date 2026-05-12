@@ -1,0 +1,14 @@
+{
+  "name": "sign-os",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sign Language Operating System — Monorepo",
+  "scripts": {
+    "dev:web": "pnpm --filter @sign-os/web dev",
+    "dev:api": "cd apps/api && poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "dev:worker": "cd apps/worker && poetry run celery -A celery_app worker --loglevel=info",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down"
+  },
+  "packageManager": "pnpm@10.15.1"
+}

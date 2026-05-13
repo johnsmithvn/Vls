@@ -3,39 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Hand, RotateCcw, X } from "lucide-react";
-
-// Vietnamese Sign Language alphabet (29 letters)
-const ALPHABET = [
-  { letter: "A", mnemonic: "Nắm tay, ngón cái sang ngang" },
-  { letter: "Ă", mnemonic: "Giống A, thêm dấu trăng" },
-  { letter: "Â", mnemonic: "Giống A, thêm dấu mũ" },
-  { letter: "B", mnemonic: "Bàn tay mở, ngón cái gập" },
-  { letter: "C", mnemonic: "Bàn tay cong hình chữ C" },
-  { letter: "D", mnemonic: "Ngón trỏ thẳng, còn lại nắm" },
-  { letter: "Đ", mnemonic: "Giống D, ngón trỏ gạch ngang" },
-  { letter: "E", mnemonic: "Các ngón gập tạo hình E" },
-  { letter: "Ê", mnemonic: "Giống E, thêm dấu mũ" },
-  { letter: "G", mnemonic: "Ngón trỏ + cái chỉ ngang" },
-  { letter: "H", mnemonic: "Hai ngón trỏ + giữa thẳng" },
-  { letter: "I", mnemonic: "Ngón út thẳng, còn lại nắm" },
-  { letter: "K", mnemonic: "Ngón trỏ + giữa chữ V, cái chạm giữa" },
-  { letter: "L", mnemonic: "Ngón cái + trỏ thẳng góc 90°" },
-  { letter: "M", mnemonic: "Ba ngón gập trên ngón cái" },
-  { letter: "N", mnemonic: "Hai ngón gập trên ngón cái" },
-  { letter: "O", mnemonic: "Các ngón chạm cái tạo hình O" },
-  { letter: "Ô", mnemonic: "Giống O, thêm dấu mũ" },
-  { letter: "Ơ", mnemonic: "Giống O, thêm dấu móc" },
-  { letter: "P", mnemonic: "Giống K, úp xuống" },
-  { letter: "Q", mnemonic: "Giống G, úp xuống" },
-  { letter: "R", mnemonic: "Ngón trỏ + giữa bắt chéo" },
-  { letter: "S", mnemonic: "Nắm tay, ngón cái phía trước" },
-  { letter: "T", mnemonic: "Ngón cái kẹp giữa trỏ + giữa" },
-  { letter: "U", mnemonic: "Ngón trỏ + giữa thẳng sát nhau" },
-  { letter: "Ư", mnemonic: "Giống U, thêm dấu móc" },
-  { letter: "V", mnemonic: "Ngón trỏ + giữa xòe hình V" },
-  { letter: "X", mnemonic: "Ngón trỏ gập hình móc câu" },
-  { letter: "Y", mnemonic: "Ngón cái + út xòe, còn lại nắm" },
-];
+import ALPHABET from "@/data/alphabet.json";
 
 export default function AlphabetPage() {
   const [selectedLetter, setSelectedLetter] = useState<typeof ALPHABET[number] | null>(null);

@@ -77,3 +77,55 @@ export async function getWordDetail(wordId: string): Promise<WordDetail> {
   const res = await apiFetch<WordDetail>(`/api/v1/dictionary/words/${wordId}`);
   return res.data;
 }
+
+// ── Translation ──────────────────────────────────────────
+
+export type TranslationMode = "auto" | "word_by_word" | "fingerspell";
+
+export interface TranslationSignAsset {
+  id: string;
+  media_type: string;
+  url: string;
+  file_format: string;
+  view_angle: string | null;
+  step_order: number;
+  metadata: Record<string, unknown> | null;
+}
+
+export interface TranslationSign {
+  sign_id: string | null;
+  assets: TranslationSignAsset[];
+  variant_name: string | null;
+}
+
+export interface ResolvedToken {
+  token: string;
+  result_type: "phrase_match" | "word_match" | "fingerspell";
+  word_id: string | null;
+  sign: TranslationSign | null;
+  letters: ResolvedToken[] | null;
+}
+
+export interface TranslationResult {
+  original_text: string;
+  tokens: string[];
+  results: ResolvedToken[];
+  stats: {
+    total_tokens: number;
+    phrase_match: number;
+    word_match: number;
+    fingerspell: number;
+    coverage: number;
+  };
+}
+
+export async function translateText(
+  text: string,
+  mode: TranslationMode = "auto",
+): Promise<TranslationResult> {
+  const res = await apiFetch<TranslationResult>("/api/v1/translation/translate", {
+    method: "POST",
+    body: JSON.stringify({ text, mode }),
+  });
+  return res.data;
+}

@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   { href: "/", label: "Tra cứu", icon: Search },
   { href: "/alphabet", label: "Chữ cái", icon: Hand },
+  { href: "/translate", label: "Dịch câu", icon: Languages },
   { href: "/notebook", label: "Sổ tay", icon: BookOpen },
 ];
 

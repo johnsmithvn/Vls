@@ -33,19 +33,21 @@
   - Khu vực 3: View Angle Tabs + text mô tả từng bước.
 - **Adaptive Video Strategy:** `WebP animated` (preview nhẹ) → `WebM` (playback) → `MP4` (fallback).
 
-### 2.3. Dịch Câu — SignTimelinePlayer
+### 2.3. Dịch Câu — SignTimelinePlayer ✅ IMPLEMENTED
 Đây là **Mini Media Sequencing Engine**, không phải slider ảnh tĩnh.
 
-- **Translation Mode Selector:** Cho phép user chọn chế độ dịch:
+- **Translation Mode Selector:** ✅ Cho phép user chọn chế độ dịch:
   | Mode | Mô tả |
   |---|---|
   | `Tự động` | Hệ thống tự chọn Tier tốt nhất (mặc định) |
   | `Từng từ` | Luôn dịch word-by-word, bỏ qua phrase matching |
   | `Đánh vần` | Luôn fingerspell toàn bộ (dùng khi luyện chữ cái) |
 
-- **Timing Engine:** Đọc `duration_ms` từ `metadata` của từng `SignAsset`. Không dùng Fixed Timer.
-- **Playback Controls:** Play/Pause, Speed (0.5x, 1x, 1.5x).
-- **Fingerspell Visual Cue:** Khi fallback xuống Tier 3, hiển thị icon ❓ + text mờ: *"Từ này chưa có ký hiệu, đang hiển thị đánh vần..."*
+- **Timing Engine:** ✅ Đọc `duration_ms` từ `metadata` của từng `SignAsset`. Default 1200ms khi thiếu metadata.
+- **Playback Controls:** ✅ Play/Pause, Reset, Speed (0.5x, 1x, 1.5x).
+- **Progress Bar:** ✅ Tiến trình phát tổng thể + token counter + time display.
+- **Active Token Highlighting:** ✅ Auto-scroll + scale effect + pulse indicator.
+- **Fingerspell Visual Cue:** ✅ Khi fallback xuống Tier 3, hiển thị icon ❓ + text mờ: *"Chưa có ký hiệu"*
 - **Translation Result Types** (Backend trả về flag để FE render đúng):
   | Type | Ý nghĩa |
   |---|---|

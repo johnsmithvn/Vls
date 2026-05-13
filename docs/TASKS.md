@@ -4,16 +4,19 @@
 
 ## 1. ROADMAP (5 PHASES)
 
-### Phase 1: Focused MVP — Dictionary + Notebook + Auth ← **HIỆN TẠI**
+### Phase 1: Focused MVP — Dictionary + Notebook + Auth ← **DONE ✅**
 - Monorepo scaffold (pnpm workspace + Docker Compose).
 - Auth system (Supabase Auth + JWT).
 - CSDL 3 lớp: `Word` → `CanonicalSign` → `SignAsset` + `QueryLog`.
 - Media Pipeline: Pre-signed URL (R2) + Celery Worker.
 - Tính năng: Bảng chữ cái, Tra từ, Sổ tay cá nhân.
 
-### Phase 2: Sentence Mapping (Rule-based)
+### Phase 2: Sentence Mapping (Rule-based) ← **DONE ✅**
 - Tokenizer tiếng Việt + Grammar Engine + 3-Tier Resolution.
 - SignTimelinePlayer + Fingerspelling Fallback.
+- Translation Mode Selector (auto / word_by_word / fingerspell).
+
+### Phase 3: Learning Analytics & AI Coach ← **HIỆN TẠI**
 
 ### Phase 3: Learning Analytics & AI Coach (The Real Moat)
 - Spaced Repetition, Practice Mode, Compare Mode.
@@ -78,3 +81,75 @@
 - [x] Frontend ↔ API: Live search auto-suggest working ✅
 - [ ] Seed media: upload sign images/videos to R2 (cần R2 bucket)
 - [ ] Deploy: Supabase + Railway/Render + Vercel + R2
+
+---
+
+## 7. ✅ SPRINT 2.1 — Vietnamese Tokenizer — DONE
+
+- [x] `ai/semantic/tokenizer.py`: underthesea word_tokenize + stop-word removal
+- [x] Normalize: lowercase + collapse whitespace
+- [x] Compound word detection ("xin chào" stays as one token)
+
+## 8. ✅ SPRINT 2.2 — 3-Tier Resolution Engine — DONE
+
+- [x] `ai/semantic/resolver.py`: Tier 1 phrase_match, Tier 2 word_match, Tier 3 fingerspell
+- [x] `modules/translation/service.py`: Orchestrator (tokenize → resolve → log)
+- [x] `modules/translation/models.py`: QueryLog model (data-driven growth)
+- [x] `modules/translation/schemas.py`: TranslateRequest/Response DTOs
+- [x] Fingerspell fallback logs to `query_logs` table automatically
+
+## 9. ✅ SPRINT 2.3 — Translation API — DONE
+
+- [x] `modules/translation/router.py`: `POST /api/v1/translation/translate`
+- [x] Registered in `main.py` (10 total routes)
+- [x] Supports both authenticated + anonymous users
+- [x] E2E verified:
+  - "Mẹ yêu con" → 3 word_match, 100% coverage ✅
+  - "blockchain" → fingerspell fallback ✅
+  - QueryLog records fingerspell tokens ✅
+
+## 10. ✅ SPRINT 2.4 — Frontend Translation UI — DONE
+
+- [x] `features/translation/TranslationUI.tsx` (TranslationInput + SignTimeline + TokenCard)
+- [x] `/translate` page — full translation flow with example buttons
+- [x] Header nav updated (4 items: Tra cứu, Chữ cái, Dịch câu, Sổ tay)
+- [x] Home page "Dịch câu" card links to `/translate` (removed "Sắp ra mắt" badge)
+- [x] Color-coded token cards: green=phrase, blue=word, amber=fingerspell
+- [x] Fingerspell visual cue (❓ + warning text)
+- [x] B7 fix: Alphabet data extracted to `src/data/alphabet.json`
+- [x] Build passed ✓ (6 routes)
+- [x] E2E verified: "Mẹ yêu con" → 3 word_match, 100% coverage ✅
+
+## 11. ✅ SPRINT 2.5 — SignTimelinePlayer & Translation Modes — DONE
+
+### Violations Fixed
+- [x] Fix `main.py` version `0.1.0` → `0.2.1`
+- [x] Fix translation router `response_model=dict` → untyped (standard contract via return)
+- [x] Align `TranslateRequest.mode` with `packages/types` enums (`auto`/`word_by_word`/`fingerspell`)
+
+### Backend: Translation Mode Support
+- [x] `schemas.py`: mode field → `auto | word_by_word | fingerspell`
+- [x] `resolver.py`: mode parameter added to `resolve_token()` + `translate()`
+  - `auto` = full 3-tier (phrase → word → fingerspell)
+  - `word_by_word` = skip phrase matching
+  - `fingerspell` = force fingerspell all tokens
+- [x] `service.py`: mode passthrough from request to resolver
+- [x] `router.py`: pass `body.mode` to `translate_text()`
+- [x] Refactored: `_extract_sign_data()` + `_word_query_options()` helper (DRY)
+- [x] Asset response now includes `metadata` field (for `duration_ms`)
+
+### Frontend: SignTimelinePlayer
+- [x] `TranslationModeSelector.tsx` — 3 mode buttons (Tự động / Từng từ / Đánh vần)
+- [x] `SignTimelinePlayer.tsx` — Mini Media Sequencing Engine:
+  - State machine: idle → playing → paused → complete
+  - Auto-advance based on `duration_ms` from asset metadata (default 1200ms)
+  - Play/Pause toggle + Reset button
+  - Speed selector (0.5x / 1x / 1.5x)
+  - Progress bar with time display
+  - Active token highlighting with auto-scroll
+  - Tier-colored token cards (green=phrase, blue=word, amber=fingerspell)
+- [x] `TranslationUI.tsx` — TranslationInput accepts `mode` parameter
+- [x] `api.ts` — `translateText()` accepts mode, `TranslationSignAsset` includes `metadata`
+- [x] `/translate` page — integrated Mode Selector + Player
+- [x] Build passed ✓ (7 routes)
+

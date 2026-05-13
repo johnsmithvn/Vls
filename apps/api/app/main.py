@@ -11,10 +11,11 @@ from app.modules.auth.router import router as auth_router
 from app.modules.dictionary.router import router as dictionary_router
 from app.modules.media.router import router as media_router
 from app.modules.notebook.router import router as notebook_router
+from app.modules.translation.router import router as translation_router
 
 app = FastAPI(
     title="Sign Language OS API",
-    version="0.1.0",
+    version="0.3.0",
     description="Structured Sign Knowledge Graph API",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
@@ -38,6 +39,7 @@ app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(dictionary_router, prefix="/api/v1/dictionary", tags=["dictionary"])
 app.include_router(media_router, prefix="/api/v1/media", tags=["media"])
 app.include_router(notebook_router, prefix="/api/v1/notebook", tags=["notebook"])
+app.include_router(translation_router, prefix="/api/v1/translation", tags=["translation"])
 
 
 @app.get("/api/v1/health", tags=["health"])

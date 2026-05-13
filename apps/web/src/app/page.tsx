@@ -43,12 +43,11 @@ export default function HomePage() {
           color="accent"
         />
         <FeatureLink
-          href="/"
+          href="/translate"
           icon={<Sparkles className="h-6 w-6" />}
           title="Dịch câu"
           description="Nhập câu tiếng Việt → xem chuỗi ký hiệu tương ứng"
           color="success"
-          badge="Sắp ra mắt"
         />
       </section>
     </div>

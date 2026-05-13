@@ -13,7 +13,7 @@ if not exist "apps\api\.env" (
 )
 
 if not exist "node_modules" (
-    echo Dang cai dat cac thu vien can thiet (pnpm install)...
+    echo Dang cai dat cac thu vien can thiet bang lenh pnpm install...
     call pnpm install
 )
 
@@ -28,7 +28,7 @@ if %errorlevel% neq 0 (
 
 echo.
 echo [3/5] Doi Database khoi dong va nap du lieu mau (Seed Data)...
-timeout /t 3 /nobreak >nul
+ping 127.0.0.1 -n 4 > nul
 cd apps\api
 echo - Chay Migration (Cap nhat cau truc bang)...
 call poetry run alembic upgrade head

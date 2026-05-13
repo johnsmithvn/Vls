@@ -95,9 +95,11 @@ def generate_svg(letter: str, mnemonic: str, color: str) -> str:
 
 
 def main():
+    # Path: D:\Development\Workspace\VLS\apps\api\scripts\generate_alphabet_svgs.py
+    # We want to go up to VLS root, then into apps\web\public\signs\alphabet
     output_dir = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
-        "apps", "web", "public", "signs", "alphabet",
+        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+        "web", "public", "signs", "alphabet",
     )
     os.makedirs(output_dir, exist_ok=True)
 

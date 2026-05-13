@@ -28,14 +28,10 @@ from app.modules.auth.models import User
 
 ALPHABET = [
     ("A", "Nắm tay, ngón cái sang ngang"),
-    ("Ă", "Giống A, thêm dấu trăng"),
-    ("Â", "Giống A, thêm dấu mũ"),
     ("B", "Bàn tay mở, ngón cái gập"),
     ("C", "Bàn tay cong hình chữ C"),
     ("D", "Ngón trỏ thẳng, còn lại nắm"),
-    ("Đ", "Giống D, ngón trỏ gạch ngang"),
     ("E", "Các ngón gập tạo hình E"),
-    ("Ê", "Giống E, thêm dấu mũ"),
     ("G", "Ngón trỏ + cái chỉ ngang"),
     ("H", "Hai ngón trỏ + giữa thẳng"),
     ("I", "Ngón út thẳng, còn lại nắm"),
@@ -44,15 +40,12 @@ ALPHABET = [
     ("M", "Ba ngón gập trên ngón cái"),
     ("N", "Hai ngón gập trên ngón cái"),
     ("O", "Các ngón chạm cái tạo hình O"),
-    ("Ô", "Giống O, thêm dấu mũ"),
-    ("Ơ", "Giống O, thêm dấu móc"),
     ("P", "Giống K, úp xuống"),
     ("Q", "Giống G, úp xuống"),
     ("R", "Ngón trỏ + giữa bắt chéo"),
     ("S", "Nắm tay, ngón cái phía trước"),
     ("T", "Ngón cái kẹp giữa trỏ + giữa"),
     ("U", "Ngón trỏ + giữa thẳng sát nhau"),
-    ("Ư", "Giống U, thêm dấu móc"),
     ("V", "Ngón trỏ + giữa xòe hình V"),
     ("X", "Ngón trỏ gập hình móc câu"),
     ("Y", "Ngón cái + út xòe, còn lại nắm"),
@@ -111,21 +104,14 @@ VOCABULARY = [
 ]
 
 
-# Map Vietnamese letters to safe filenames (matching generate_alphabet_svgs.py)
-FILENAME_MAP = {
-    "Ă": "a_breve", "Â": "a_circumflex", "Đ": "d_stroke",
-    "Ê": "e_circumflex", "Ô": "o_circumflex", "Ơ": "o_horn", "Ư": "u_horn",
-}
-
-
 def normalize(text: str) -> str:
     """Simple Vietnamese text normalization."""
     return text.lower().strip()
 
 
 def letter_to_filename(letter: str) -> str:
-    """Convert Vietnamese letter to safe filename for SVG lookup."""
-    return FILENAME_MAP.get(letter, letter.lower())
+    """Convert letter to safe filename for SVG lookup."""
+    return letter.lower()
 
 
 async def seed():

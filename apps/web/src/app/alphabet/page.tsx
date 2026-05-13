@@ -2,138 +2,150 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Hand, RotateCcw, X } from "lucide-react";
-import ALPHABET from "@/data/alphabet.json";
+import { Hand, PenTool, X } from "lucide-react";
+import DATA from "@/data/alphabet.json";
+
+type LetterItem = (typeof DATA.letters)[number];
+type DiacriticItem =
+  | (typeof DATA.diacritics.letter_modifiers)[number]
+  | (typeof DATA.diacritics.tone_marks)[number];
 
 export default function AlphabetPage() {
-  const [selectedLetter, setSelectedLetter] = useState<typeof ALPHABET[number] | null>(null);
-  const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
-
-  const toggleFlip = (letter: string) => {
-    setFlippedCards((prev) => {
-      const next = new Set(prev);
-      if (next.has(letter)) next.delete(letter);
-      else next.add(letter);
-      return next;
-    });
-  };
-
-  const resetAll = () => setFlippedCards(new Set());
-  const flipAll = () => setFlippedCards(new Set(ALPHABET.map((a) => a.letter)));
+  const [selectedLetter, setSelectedLetter] = useState<LetterItem | null>(null);
+  const [selectedDiacritic, setSelectedDiacritic] =
+    useState<DiacriticItem | null>(null);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       {/* Header */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-              <Hand className="h-5 w-5 text-primary" />
-            </div>
-            <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-              Bảng chữ cái Ngôn ngữ Ký hiệu
-            </h1>
+      <div className="mb-8">
+        <div className="mb-2 flex items-center gap-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <Hand className="h-5 w-5 text-primary" />
           </div>
-          <p className="text-muted">
-            Nhấn vào thẻ để xem mô tả cách ra ký hiệu. Học 29 chữ cái tiếng Việt trong ngôn ngữ ký hiệu.
-          </p>
+          <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+            Bảng chữ cái Ngôn ngữ Ký hiệu
+          </h1>
         </div>
-
-        {/* Controls */}
-        <div className="flex gap-2">
-          <button
-            onClick={flipAll}
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-muted
-                       transition-all hover:border-primary hover:text-primary"
-          >
-            Lật tất cả
-          </button>
-          <button
-            onClick={resetAll}
-            className="flex items-center gap-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm
-                       font-medium text-muted transition-all hover:border-primary hover:text-primary"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-            Reset
-          </button>
-        </div>
+        <p className="text-muted">
+          Nhấn vào thẻ để xem chi tiết cách ra ký hiệu. Học{" "}
+          {DATA.letters.length} chữ cái cơ bản + 9 dấu thanh & dấu phụ.
+        </p>
       </div>
 
-      {/* Progress */}
-      <div className="mb-6">
-        <div className="mb-1 flex items-center justify-between text-sm">
-          <span className="text-muted">Tiến độ</span>
-          <span className="font-medium text-primary">
-            {flippedCards.size}/{ALPHABET.length} đã xem
-          </span>
-        </div>
-        <div className="h-2 overflow-hidden rounded-full bg-border">
-          <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-primary to-primary-light"
-            initial={{ width: 0 }}
-            animate={{ width: `${(flippedCards.size / ALPHABET.length) * 100}%` }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          />
-        </div>
+      {/* ═══════════════ SECTION 1: Base Letters ═══════════════ */}
+      <h2 className="mb-4 text-lg font-bold">
+        Chữ cái cơ bản ({DATA.letters.length} ký hiệu)
+      </h2>
+      <div className="grid grid-cols-4 gap-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8">
+        {DATA.letters.map((item, i) => (
+          <motion.button
+            key={item.letter}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: i * 0.02 }}
+            onClick={() => setSelectedLetter(item)}
+            className="group flex flex-col items-center justify-center rounded-2xl border border-border
+                       bg-surface p-4 shadow-sm transition-all
+                       hover:shadow-lg hover:-translate-y-1 hover:border-primary/40
+                       active:scale-95 cursor-pointer"
+          >
+            <span className="text-4xl font-bold text-primary sm:text-5xl group-hover:scale-110 transition-transform">
+              {item.letter}
+            </span>
+            <span className="mt-2 text-[10px] text-muted opacity-0 group-hover:opacity-100 transition-opacity">
+              Xem chi tiết
+            </span>
+          </motion.button>
+        ))}
       </div>
 
-      {/* Grid — large cards */}
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
-        {ALPHABET.map((item) => {
-          const isFlipped = flippedCards.has(item.letter);
-          return (
-            <div
-              key={item.letter}
-              className="perspective-[800px] cursor-pointer"
-              onClick={() => toggleFlip(item.letter)}
-              onDoubleClick={() => setSelectedLetter(item)}
+      {/* ═══════════════ SECTION 2: Letter Modifiers ═══════════════ */}
+      <div className="mt-12">
+        <div className="mb-4 flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10">
+            <PenTool className="h-4 w-4 text-violet-600" />
+          </div>
+          <h2 className="text-lg font-bold">Dấu phụ chữ cái</h2>
+        </div>
+        <p className="mb-4 text-sm text-muted">
+          Sau khi ra ký hiệu chữ cái gốc, thêm cử chỉ dấu phụ để tạo thành Ă,
+          Â, Đ, Ê, Ô, Ơ, Ư.
+        </p>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {DATA.diacritics.letter_modifiers.map((d) => (
+            <motion.button
+              key={d.id}
+              whileHover={{ y: -4 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setSelectedDiacritic(d)}
+              className="cursor-pointer rounded-2xl border border-border bg-surface p-4 shadow-sm
+                         text-left transition-all hover:shadow-lg hover:border-violet-300"
             >
-              <motion.div
-                className="relative h-36 w-full sm:h-40 md:h-44"
-                animate={{ rotateY: isFlipped ? 180 : 0 }}
-                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                {/* Front */}
-                <div
-                  className={`absolute inset-0 flex flex-col items-center justify-center rounded-2xl
-                             border bg-surface shadow-sm transition-all
-                             ${isFlipped ? "" : "hover:shadow-md hover:-translate-y-0.5"}
-                             ${isFlipped ? "border-border" : "border-border hover:border-primary/30"}`}
-                  style={{ backfaceVisibility: "hidden" }}
-                >
-                  <span className="text-5xl font-bold text-primary sm:text-6xl">{item.letter}</span>
-                  <span className="mt-2 text-xs text-muted">Nhấn để lật</span>
-                </div>
+              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-violet-50 mx-auto overflow-hidden">
+                <img
+                  src={d.image}
+                  alt={d.name}
+                  className="h-full w-full object-contain"
+                />
+              </div>
+              <h3 className="text-center text-sm font-bold text-violet-700">
+                {d.name}
+              </h3>
+              <p className="mt-1 text-center text-xs text-muted">
+                {"applies_to" in d ? d.applies_to.join(", ") : ""}
+              </p>
+            </motion.button>
+          ))}
+        </div>
+      </div>
 
-                {/* Back */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl
-                             border border-primary/30 bg-primary-subtle p-3"
-                  style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-                >
-                  <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-xl bg-white/60 overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt={`Ký hiệu chữ ${item.letter}`}
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                  <span className="text-center text-xs font-medium leading-snug text-primary">
-                    {item.mnemonic}
-                  </span>
-                </div>
-              </motion.div>
-            </div>
-          );
-        })}
+      {/* ═══════════════ SECTION 3: Tone Marks ═══════════════ */}
+      <div className="mt-10">
+        <div className="mb-4 flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/10">
+            <PenTool className="h-4 w-4 text-rose-500" />
+          </div>
+          <h2 className="text-lg font-bold">Dấu thanh</h2>
+        </div>
+        <p className="mb-4 text-sm text-muted">
+          5 dấu thanh điệu. Sau khi đánh vần xong từ, dùng cử chỉ tay để biểu
+          thị thanh điệu. Thanh ngang không cần thêm cử chỉ.
+        </p>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+          {DATA.diacritics.tone_marks.map((t) => (
+            <motion.button
+              key={t.id}
+              whileHover={{ y: -4 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setSelectedDiacritic(t)}
+              className="cursor-pointer rounded-2xl border border-border bg-surface p-4 shadow-sm
+                         text-left transition-all hover:shadow-lg hover:border-rose-300"
+            >
+              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-rose-50 mx-auto overflow-hidden">
+                <img
+                  src={t.image}
+                  alt={t.name}
+                  className="h-full w-full object-contain"
+                />
+              </div>
+              <h3 className="text-center text-sm font-bold text-rose-600">
+                {t.name}
+              </h3>
+              <p className="mt-1 text-center text-xs text-muted">
+                {"example" in t ? t.example : ""}
+              </p>
+            </motion.button>
+          ))}
+        </div>
       </div>
 
       {/* Hint */}
-      <p className="mt-6 text-center text-xs text-muted">
-        💡 Nhấn đúp để xem chi tiết • Nhấn một lần để lật thẻ
+      <p className="mt-8 text-center text-xs text-muted">
+        Nhấn vào bất kỳ thẻ nào để xem chi tiết cách ra ký hiệu
       </p>
 
-      {/* Detail Modal */}
+      {/* ═══════════════ Letter Detail Modal ═══════════════ */}
       <AnimatePresence>
         {selectedLetter && (
           <motion.div
@@ -144,36 +156,127 @@ export default function AlphabetPage() {
             onClick={() => setSelectedLetter(null)}
           >
             <motion.div
-              className="relative w-full max-w-sm rounded-2xl border border-border bg-surface p-8 shadow-2xl"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative w-full max-w-md rounded-2xl border border-border bg-surface p-8 shadow-2xl"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setSelectedLetter(null)}
-                className="absolute right-4 top-4 rounded-lg p-1 text-muted hover:bg-surface-hover transition-colors"
+                className="absolute right-4 top-4 rounded-lg p-1.5 text-muted hover:bg-surface-hover transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
 
               <div className="text-center">
-                <div className="mb-4 inline-flex h-24 w-24 items-center justify-center rounded-2xl bg-primary/10">
-                  <span className="text-6xl font-bold text-primary">{selectedLetter.letter}</span>
+                {/* Letter badge */}
+                <div className="mb-5 inline-flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 ring-2 ring-primary/10">
+                  <span className="text-6xl font-extrabold text-primary">
+                    {selectedLetter.letter}
+                  </span>
                 </div>
-                <h2 className="mb-2 text-xl font-bold">Chữ {selectedLetter.letter}</h2>
-                <p className="text-muted">{selectedLetter.mnemonic}</p>
 
-                <div className="mt-6 rounded-xl bg-surface-hover p-4">
-                  <div className="flex h-40 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
+                <h2 className="mb-1 text-2xl font-bold">
+                  Chữ {selectedLetter.letter}
+                </h2>
+                <p className="text-muted mb-5">{selectedLetter.mnemonic}</p>
+
+                {/* Image preview */}
+                <div className="rounded-xl bg-surface-hover p-5">
+                  <div className="flex h-48 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
                     <img
                       src={selectedLetter.image}
                       alt={`Ký hiệu chữ ${selectedLetter.letter}`}
                       className="h-full w-full object-contain"
                     />
                   </div>
-                  <p className="mt-2 text-xs text-muted">
-                    Ảnh placeholder — sẽ thay bằng video thật khi có media
+                  <p className="mt-3 text-xs text-muted">
+                    Placeholder — sẽ thay bằng video/ảnh thật khi có media
+                  </p>
+                </div>
+
+                {/* How-to */}
+                <div className="mt-5 rounded-xl border border-primary/10 bg-primary/5 p-4 text-left">
+                  <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-1">
+                    Cách ra ký hiệu
+                  </p>
+                  <p className="text-sm text-foreground">
+                    {selectedLetter.mnemonic}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ═══════════════ Diacritic Detail Modal ═══════════════ */}
+      <AnimatePresence>
+        {selectedDiacritic && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedDiacritic(null)}
+          >
+            <motion.div
+              className="relative w-full max-w-md rounded-2xl border border-border bg-surface p-8 shadow-2xl"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedDiacritic(null)}
+                className="absolute right-4 top-4 rounded-lg p-1.5 text-muted hover:bg-surface-hover transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              <div className="text-center">
+                {/* Icon */}
+                <div className="mb-5 flex h-28 w-28 mx-auto items-center justify-center rounded-2xl bg-violet-50 overflow-hidden ring-2 ring-violet-100">
+                  <img
+                    src={selectedDiacritic.image}
+                    alt={selectedDiacritic.name}
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+
+                <h2 className="mb-3 text-2xl font-bold">
+                  {selectedDiacritic.name}
+                </h2>
+
+                {"applies_to" in selectedDiacritic && (
+                  <div className="mb-4 flex flex-wrap justify-center gap-1.5">
+                    {selectedDiacritic.applies_to.map((a: string) => (
+                      <span
+                        key={a}
+                        className="rounded-full bg-violet-100 px-3 py-1 text-xs font-medium text-violet-700"
+                      >
+                        {a}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {"example" in selectedDiacritic && (
+                  <p className="mb-4 text-sm text-muted">
+                    Ví dụ: {selectedDiacritic.example}
+                  </p>
+                )}
+
+                {/* How-to */}
+                <div className="mt-4 rounded-xl border border-violet-100 bg-violet-50/50 p-4 text-left">
+                  <p className="text-xs font-semibold text-violet-600 uppercase tracking-wider mb-1">
+                    Cách ra ký hiệu
+                  </p>
+                  <p className="text-sm text-foreground">
+                    {selectedDiacritic.gesture}
                   </p>
                 </div>
               </div>

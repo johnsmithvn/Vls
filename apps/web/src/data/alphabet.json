@@ -1,55 +1,155 @@
 {
   "letters": [
-    { "letter": "A", "mnemonic": "Nắm tay, ngón cái sang ngang", "image": "/signs/alphabet/a.svg" },
-    { "letter": "B", "mnemonic": "Bàn tay mở, ngón cái gập", "image": "/signs/alphabet/b.svg" },
-    { "letter": "C", "mnemonic": "Bàn tay cong hình chữ C", "image": "/signs/alphabet/c.svg" },
-    { "letter": "D", "mnemonic": "Ngón trỏ thẳng, còn lại nắm", "image": "/signs/alphabet/d.svg" },
-    { "letter": "E", "mnemonic": "Các ngón gập tạo hình E", "image": "/signs/alphabet/e.svg" },
-    { "letter": "G", "mnemonic": "Ngón trỏ + cái chỉ ngang", "image": "/signs/alphabet/g.svg" },
-    { "letter": "H", "mnemonic": "Hai ngón trỏ + giữa thẳng", "image": "/signs/alphabet/h.svg" },
-    { "letter": "I", "mnemonic": "Ngón út thẳng, còn lại nắm", "image": "/signs/alphabet/i.svg" },
-    { "letter": "K", "mnemonic": "Ngón trỏ + giữa chữ V, cái chạm giữa", "image": "/signs/alphabet/k.svg" },
-    { "letter": "L", "mnemonic": "Ngón cái + trỏ thẳng góc 90°", "image": "/signs/alphabet/l.svg" },
-    { "letter": "M", "mnemonic": "Ba ngón gập trên ngón cái", "image": "/signs/alphabet/m.svg" },
-    { "letter": "N", "mnemonic": "Hai ngón gập trên ngón cái", "image": "/signs/alphabet/n.svg" },
-    { "letter": "O", "mnemonic": "Các ngón chạm cái tạo hình O", "image": "/signs/alphabet/o.svg" },
-    { "letter": "P", "mnemonic": "Giống K, úp xuống", "image": "/signs/alphabet/p.svg" },
-    { "letter": "Q", "mnemonic": "Giống G, úp xuống", "image": "/signs/alphabet/q.svg" },
-    { "letter": "R", "mnemonic": "Ngón trỏ + giữa bắt chéo", "image": "/signs/alphabet/r.svg" },
-    { "letter": "S", "mnemonic": "Nắm tay, ngón cái phía trước", "image": "/signs/alphabet/s.svg" },
-    { "letter": "T", "mnemonic": "Ngón cái kẹp giữa trỏ + giữa", "image": "/signs/alphabet/t.svg" },
-    { "letter": "U", "mnemonic": "Ngón trỏ + giữa thẳng sát nhau", "image": "/signs/alphabet/u.svg" },
-    { "letter": "V", "mnemonic": "Ngón trỏ + giữa xòe hình V", "image": "/signs/alphabet/v.svg" },
-    { "letter": "X", "mnemonic": "Ngón trỏ gập hình móc câu", "image": "/signs/alphabet/x.svg" },
-    { "letter": "Y", "mnemonic": "Ngón cái + út xòe, còn lại nắm", "image": "/signs/alphabet/y.svg" }
+    {
+      "letter": "A",
+      "mnemonic": "Nắm tay, ngón cái sang ngang",
+      "image": "/signs/alphabet/a.svg",
+      "video": "https://drive.google.com/file/d/1JAEf3N-KNQBPFV0Q_QxoSrhiIZFWiAju/preview"
+    },
+    {
+      "letter": "B",
+      "mnemonic": "Bàn tay mở, ngón cái gập",
+      "image": "/signs/alphabet/b.svg"
+    },
+    {
+      "letter": "C",
+      "mnemonic": "Bàn tay cong hình chữ C",
+      "image": "/signs/alphabet/c.svg"
+    },
+    {
+      "letter": "D",
+      "mnemonic": "Ngón trỏ thẳng, còn lại nắm",
+      "image": "/signs/alphabet/d.svg"
+    },
+    {
+      "letter": "E",
+      "mnemonic": "Các ngón gập tạo hình E",
+      "image": "/signs/alphabet/e.svg"
+    },
+    {
+      "letter": "G",
+      "mnemonic": "Ngón trỏ + cái chỉ ngang",
+      "image": "/signs/alphabet/g.svg"
+    },
+    {
+      "letter": "H",
+      "mnemonic": "Hai ngón trỏ + giữa thẳng",
+      "image": "/signs/alphabet/h.svg"
+    },
+    {
+      "letter": "I",
+      "mnemonic": "Ngón út thẳng, còn lại nắm",
+      "image": "/signs/alphabet/i.svg"
+    },
+    {
+      "letter": "K",
+      "mnemonic": "Ngón trỏ + giữa chữ V, cái chạm giữa",
+      "image": "/signs/alphabet/k.svg"
+    },
+    {
+      "letter": "L",
+      "mnemonic": "Ngón cái + trỏ thẳng góc 90°",
+      "image": "/signs/alphabet/l.svg"
+    },
+    {
+      "letter": "M",
+      "mnemonic": "Ba ngón gập trên ngón cái",
+      "image": "/signs/alphabet/m.svg"
+    },
+    {
+      "letter": "N",
+      "mnemonic": "Hai ngón gập trên ngón cái",
+      "image": "/signs/alphabet/n.svg"
+    },
+    {
+      "letter": "O",
+      "mnemonic": "Các ngón chạm cái tạo hình O",
+      "image": "/signs/alphabet/o.svg"
+    },
+    {
+      "letter": "P",
+      "mnemonic": "Giống K, úp xuống",
+      "image": "/signs/alphabet/p.svg"
+    },
+    {
+      "letter": "Q",
+      "mnemonic": "Giống G, úp xuống",
+      "image": "/signs/alphabet/q.svg"
+    },
+    {
+      "letter": "R",
+      "mnemonic": "Ngón trỏ + giữa bắt chéo",
+      "image": "/signs/alphabet/r.svg"
+    },
+    {
+      "letter": "S",
+      "mnemonic": "Nắm tay, ngón cái phía trước",
+      "image": "/signs/alphabet/s.svg"
+    },
+    {
+      "letter": "T",
+      "mnemonic": "Ngón cái kẹp giữa trỏ + giữa",
+      "image": "/signs/alphabet/t.svg"
+    },
+    {
+      "letter": "U",
+      "mnemonic": "Ngón trỏ + giữa thẳng sát nhau",
+      "image": "/signs/alphabet/u.svg"
+    },
+    {
+      "letter": "V",
+      "mnemonic": "Ngón trỏ + giữa xòe hình V",
+      "image": "/signs/alphabet/v.svg"
+    },
+    {
+      "letter": "X",
+      "mnemonic": "Ngón trỏ gập hình móc câu",
+      "image": "/signs/alphabet/x.svg"
+    },
+    {
+      "letter": "Y",
+      "mnemonic": "Ngón cái + út xòe, còn lại nắm",
+      "image": "/signs/alphabet/y.svg"
+    }
   ],
   "diacritics": {
     "letter_modifiers": [
       {
         "id": "dau_mu",
         "name": "Dấu mũ (^)",
-        "applies_to": ["A → Â", "E → Ê", "O → Ô"],
+        "applies_to": [
+          "A → Â",
+          "E → Ê",
+          "O → Ô"
+        ],
         "gesture": "Ngón trỏ vẽ hình tam giác nhỏ (^) phía trên, sau khi ra ký hiệu chữ cái gốc",
         "image": "/signs/diacritics/dau_mu.svg"
       },
       {
         "id": "dau_trang",
         "name": "Dấu trăng (˘)",
-        "applies_to": ["A → Ă"],
+        "applies_to": [
+          "A → Ă"
+        ],
         "gesture": "Ngón trỏ vẽ hình cung tròn (˘) phía trên, sau khi ra ký hiệu chữ A",
         "image": "/signs/diacritics/dau_trang.svg"
       },
       {
         "id": "dau_moc",
         "name": "Dấu móc (ơ/ư)",
-        "applies_to": ["O → Ơ", "U → Ư"],
+        "applies_to": [
+          "O → Ơ",
+          "U → Ư"
+        ],
         "gesture": "Ngón trỏ vẽ nét móc nhỏ bên phải, sau khi ra ký hiệu chữ cái gốc",
         "image": "/signs/diacritics/dau_moc.svg"
       },
       {
         "id": "dau_gach",
         "name": "Dấu gạch ngang (đ)",
-        "applies_to": ["D → Đ"],
+        "applies_to": [
+          "D → Đ"
+        ],
         "gesture": "Ngón trỏ gạch ngang qua, sau khi ra ký hiệu chữ D",
         "image": "/signs/diacritics/dau_gach.svg"
       }

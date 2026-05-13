@@ -5,13 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Hand, PenTool, X } from "lucide-react";
 import DATA from "@/data/alphabet.json";
 
-type LetterItem = (typeof DATA.letters)[number];
+type LetterItem = (typeof DATA.letters)[number] & { video?: string };
 type DiacriticItem =
   | (typeof DATA.diacritics.letter_modifiers)[number]
   | (typeof DATA.diacritics.tone_marks)[number];
 
 export default function AlphabetPage() {
   const [selectedLetter, setSelectedLetter] = useState<LetterItem | null>(null);
+  const [mediaTab, setMediaTab] = useState<"video" | "image">("image");
   const [selectedDiacritic, setSelectedDiacritic] =
     useState<DiacriticItem | null>(null);
 
@@ -44,7 +45,10 @@ export default function AlphabetPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: i * 0.02 }}
-            onClick={() => setSelectedLetter(item)}
+            onClick={() => {
+              setSelectedLetter(item);
+              setMediaTab("image");
+            }}
             className="group flex flex-col items-center justify-center rounded-2xl border border-border
                        bg-surface p-4 shadow-sm transition-all
                        hover:shadow-lg hover:-translate-y-1 hover:border-primary/40
@@ -183,18 +187,56 @@ export default function AlphabetPage() {
                 </h2>
                 <p className="text-muted mb-5">{selectedLetter.mnemonic}</p>
 
-                {/* Image preview */}
-                <div className="rounded-xl bg-surface-hover p-5">
-                  <div className="flex h-48 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
-                    <img
-                      src={selectedLetter.image}
-                      alt={`Ký hiệu chữ ${selectedLetter.letter}`}
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                  <p className="mt-3 text-xs text-muted">
-                    Placeholder — sẽ thay bằng video/ảnh thật khi có media
-                  </p>
+                {/* Media preview: Tabs */}
+                <div className="rounded-xl border border-border bg-surface-hover p-2">
+                  {selectedLetter.video && (
+                    <div className="mb-3 flex rounded-lg bg-surface p-1 shadow-sm">
+                      <button
+                        onClick={() => setMediaTab("image")}
+                        className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                          mediaTab === "image"
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "text-muted hover:text-foreground"
+                        }`}
+                      >
+                        Hình ảnh
+                      </button>
+                      <button
+                        onClick={() => setMediaTab("video")}
+                        className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                          mediaTab === "video"
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "text-muted hover:text-foreground"
+                        }`}
+                      >
+                        Video
+                      </button>
+                    </div>
+                  )}
+
+                  {mediaTab === "video" && selectedLetter.video && (
+                    <div className="overflow-hidden rounded-lg aspect-video bg-black/5">
+                      <iframe
+                        src={selectedLetter.video.replace(/\/view.*$/, "/preview")}
+                        className="h-full w-full"
+                        allow="autoplay; encrypted-media"
+                        allowFullScreen
+                        loading="lazy"
+                        title={`Video ký hiệu chữ ${selectedLetter.letter}`}
+                        style={{ border: "none" }}
+                      />
+                    </div>
+                  )}
+
+                  {mediaTab === "image" && (
+                    <div className="flex h-48 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
+                      <img
+                        src={selectedLetter.image}
+                        alt={`Ký hiệu chữ ${selectedLetter.letter}`}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* How-to */}

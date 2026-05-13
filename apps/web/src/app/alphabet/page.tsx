@@ -88,7 +88,7 @@ export default function AlphabetPage() {
             >
               <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-violet-50 mx-auto overflow-hidden">
                 <img
-                  src={d.image}
+                  src={d.images[0]}
                   alt={d.name}
                   className="h-full w-full object-contain"
                 />
@@ -128,7 +128,7 @@ export default function AlphabetPage() {
             >
               <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-rose-50 mx-auto overflow-hidden">
                 <img
-                  src={t.image}
+                  src={t.images[0]}
                   alt={t.name}
                   className="h-full w-full object-contain"
                 />
@@ -229,12 +229,28 @@ export default function AlphabetPage() {
                   )}
 
                   {mediaTab === "image" && (
-                    <div className="flex h-48 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
-                      <img
-                        src={selectedLetter.image}
-                        alt={`Ký hiệu chữ ${selectedLetter.letter}`}
-                        className="h-full w-full object-contain"
-                      />
+                    <div className="space-y-2">
+                      {selectedLetter.images && selectedLetter.images.length > 1 ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          {selectedLetter.images.map((img, idx) => (
+                            <div key={idx} className="flex h-28 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
+                              <img
+                                src={img.replace(/\/view.*$/, "/preview")}
+                                alt={`Góc độ ${idx + 1}`}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="flex h-48 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
+                          <img
+                            src={selectedLetter.images[0]}
+                            alt={`Ký hiệu chữ ${selectedLetter.letter}`}
+                            className="h-full w-full object-contain"
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -283,7 +299,7 @@ export default function AlphabetPage() {
                 {/* Icon */}
                 <div className="mb-5 flex h-28 w-28 mx-auto items-center justify-center rounded-2xl bg-violet-50 overflow-hidden ring-2 ring-violet-100">
                   <img
-                    src={selectedDiacritic.image}
+                    src={selectedDiacritic.images[0]}
                     alt={selectedDiacritic.name}
                     className="h-full w-full object-contain"
                   />

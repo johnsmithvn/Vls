@@ -17,8 +17,6 @@
 - Translation Mode Selector (auto / word_by_word / fingerspell).
 
 ### Phase 3: Learning Analytics & AI Coach ← **HIỆN TẠI**
-
-### Phase 3: Learning Analytics & AI Coach (The Real Moat)
 - Spaced Repetition, Practice Mode, Compare Mode.
 - RAG (`pgvector`) cho Semantic Translation.
 

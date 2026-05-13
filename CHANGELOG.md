@@ -6,6 +6,26 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## v0.3.1 — 2026-05-13
+
+### Added
+- **Alphabet Placeholder SVGs**: 29 SVG images cho bảng chữ cái ký hiệu (`public/signs/alphabet/`).
+- **Seed Media**: `seed.py` giờ tạo `SignAsset` records cho mỗi chữ cái, trỏ tới placeholder SVG.
+- **PWA Config**: `manifest.json`, app icons, `viewport` export → cài được lên điện thoại.
+- Script `generate_alphabet_svgs.py` để regenerate placeholder images.
+
+### Changed
+- `alphabet.json` thêm field `image` cho mỗi chữ cái.
+- Alphabet page hiển thị ảnh SVG thật thay vì emoji 🤟 placeholder.
+- Detail modal hiển thị ảnh placeholder thay vì text "sẽ thêm sau".
+- `layout.tsx` sử dụng `Viewport` export theo đúng Next.js 16 API (fix themeColor warning).
+
+### Fixed
+- Duplicate Phase 3 header trong `TASKS.md`.
+- Windows console encoding issue trong print statements.
+
+---
+
 ## v0.3.0 — 2026-05-13
 
 ### Added

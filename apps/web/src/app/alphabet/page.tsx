@@ -107,15 +107,18 @@ export default function AlphabetPage() {
                 </div>
 
                 {/* Back */}
-                <div
-                  className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl
-                             border border-primary/30 bg-primary-subtle p-4"
+                <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl
+                             border border-primary/30 bg-primary-subtle p-3"
                   style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
                 >
-                  <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                    <span className="text-3xl">🤟</span>
+                  <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-xl bg-white/60 overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt={`Ký hiệu chữ ${item.letter}`}
+                      className="h-full w-full object-contain"
+                    />
                   </div>
-                  <span className="text-center text-sm font-medium leading-snug text-primary">
+                  <span className="text-center text-xs font-medium leading-snug text-primary">
                     {item.mnemonic}
                   </span>
                 </div>
@@ -162,11 +165,15 @@ export default function AlphabetPage() {
                 <p className="text-muted">{selectedLetter.mnemonic}</p>
 
                 <div className="mt-6 rounded-xl bg-surface-hover p-4">
-                  <div className="flex h-32 items-center justify-center rounded-lg bg-primary/5">
-                    <span className="text-5xl">🤟</span>
+                  <div className="flex h-40 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
+                    <img
+                      src={selectedLetter.image}
+                      alt={`Ký hiệu chữ ${selectedLetter.letter}`}
+                      className="h-full w-full object-contain"
+                    />
                   </div>
                   <p className="mt-2 text-xs text-muted">
-                    Hình ảnh mô phỏng sẽ được thêm sau khi có media
+                    Ảnh placeholder — sẽ thay bằng video thật khi có media
                   </p>
                 </div>
               </div>

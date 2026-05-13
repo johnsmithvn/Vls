@@ -111,9 +111,21 @@ VOCABULARY = [
 ]
 
 
+# Map Vietnamese letters to safe filenames (matching generate_alphabet_svgs.py)
+FILENAME_MAP = {
+    "Ă": "a_breve", "Â": "a_circumflex", "Đ": "d_stroke",
+    "Ê": "e_circumflex", "Ô": "o_circumflex", "Ơ": "o_horn", "Ư": "u_horn",
+}
+
+
 def normalize(text: str) -> str:
     """Simple Vietnamese text normalization."""
     return text.lower().strip()
+
+
+def letter_to_filename(letter: str) -> str:
+    """Convert Vietnamese letter to safe filename for SVG lookup."""
+    return FILENAME_MAP.get(letter, letter.lower())
 
 
 async def seed():
@@ -122,14 +134,14 @@ async def seed():
         result = await db.execute(text("SELECT COUNT(*) FROM words"))
         count = result.scalar()
         if count and count > 0:
-            print(f"⚠️  Database already has {count} words. Skipping seed.")
-            print("   To re-seed, run: poetry run python scripts/truncate.py")
+            print(f"[WARN] Database already has {count} words. Skipping seed.")
+            print("   To re-seed, truncate tables first.")
             return
 
-        print("🌱 Seeding database...")
+        print("[SEED] Seeding database...")
 
         # ── Alphabet ─────────────────────────────────────────
-        print(f"   📝 Adding {len(ALPHABET)} alphabet letters...")
+        print(f"   [1/2] Adding {len(ALPHABET)} alphabet letters...")
         for letter, mnemonic in ALPHABET:
             word = Word(
                 text_vn=letter,
@@ -148,9 +160,24 @@ async def seed():
                 is_default=True,
             )
             db.add(sign)
+            await db.flush()
+
+            # Create placeholder SignAsset (SVG image from public/)
+            asset = SignAsset(
+                canonical_sign_id=sign.id,
+                media_type="image",
+                file_format="svg",
+                url=f"/signs/alphabet/{letter_to_filename(letter)}.svg",
+                view_angle="front",
+                step_order=1,
+                content_version=1,
+                is_active=True,
+                asset_metadata={"width": 320, "height": 320, "placeholder": True},
+            )
+            db.add(asset)
 
         # ── Vocabulary ───────────────────────────────────────
-        print(f"   📚 Adding {len(VOCABULARY)} vocabulary words...")
+        print(f"   [2/2] Adding {len(VOCABULARY)} vocabulary words...")
         for v in VOCABULARY:
             word = Word(
                 text_vn=v["text"],
@@ -172,8 +199,10 @@ async def seed():
 
         await db.commit()
         total = len(ALPHABET) + len(VOCABULARY)
-        print(f"   ✅ Done! Seeded {total} words ({len(ALPHABET)} letters + {len(VOCABULARY)} vocabulary)")
+        print(f"   [DONE] Seeded {total} words ({len(ALPHABET)} letters + {len(VOCABULARY)} vocabulary)")
+        print(f"   [DONE] {len(ALPHABET)} placeholder images linked")
 
 
 if __name__ == "__main__":
     asyncio.run(seed())
+

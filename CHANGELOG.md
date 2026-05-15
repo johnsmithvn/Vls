@@ -6,6 +6,16 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## v1.1.0 — 2026-05-16
+
+### Added
+- **Random Suggestions Section** on Word Detail page (`/dictionary/[id]`): "Gợi ý cho bạn" section displays 4 random word/phrase/sentence cards at the bottom. Seeded Fisher-Yates shuffle (seed = wordId) ensures different suggestions per page while being deterministic. Browse data cached for 5 minutes. Cards show entry_type badge, difficulty stars, and truncated description.
+
+### Files Modified
+- `apps/web/src/app/dictionary/[id]/page.tsx` — Added suggestion section, browseWords query, shuffleWithSeed utility
+
+---
+
 ## v1.0.0 — 2026-05-15
 
 ### ⚠️ BREAKING CHANGES

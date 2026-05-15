@@ -56,6 +56,7 @@ Hỗ trợ 3 loại entry: **Từ đơn** (`word`), **Cụm từ** (`phrase`), *
   - **Step Timeline:** Nếu ký hiệu gồm nhiều bước (`step_order`), hiện chỉ số bước
   - **View Angle labels:** Chính diện / Góc nghiêng
 - **Semantic Tags:** Hiển thị tags dạng `#tag`
+- **Random Suggestions:** "Gợi ý cho bạn" — Hiển thị 4 từ/cụm từ/câu ngẫu nhiên ở cuối trang. Seeded shuffle theo wordId để gợi ý khác nhau mỗi từ.
 
 #### 2.2.3. API Endpoints
 | Endpoint | Mô tả |

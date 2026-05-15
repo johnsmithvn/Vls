@@ -202,3 +202,12 @@
 - [x] `FEATURES.md` — Cập nhật Super Dictionary, Coming Soon, Maker-Checker
 - [x] `PLAN.md` — Cập nhật roadmap, Supabase Storage, Phase 2 scope
 - [x] Build passed ✓ (7 routes)
+
+## 14. ✅ Dictionary Detail: Random Suggestions — DONE
+
+- [x] `apps/web/src/app/dictionary/[id]/page.tsx`: Thêm section "Gợi ý cho bạn" ở cuối trang detail
+- [x] Fetch random words từ `browseWords` API (cache 5 phút)
+- [x] Seeded Fisher-Yates shuffle (seed = wordId) → hiển thị 4 gợi ý khác nhau mỗi từ
+- [x] Card UI: icon theo entry_type, badge, difficulty stars, description (truncated)
+- [x] Tự động loại bỏ từ hiện tại khỏi danh sách gợi ý
+- [x] Build passed ✓ (7 routes)

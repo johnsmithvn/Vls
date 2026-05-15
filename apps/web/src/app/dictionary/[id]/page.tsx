@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -12,10 +12,11 @@ import {
   Quote,
   MapPin,
   Play,
+  Shuffle,
 } from "lucide-react";
 import Link from "next/link";
-import { getWordDetail } from "@/lib/api";
-import type { CanonicalSign, SignAsset } from "@/lib/api";
+import { getWordDetail, browseWords } from "@/lib/api";
+import type { CanonicalSign, SignAsset, WordBrowseItem } from "@/lib/api";
 import { MediaRenderer } from "@/components/entities/MediaRenderer";
 
 const ENTRY_TYPE_CONFIG = {
@@ -31,6 +32,23 @@ const REGION_LABELS: Record<string, string> = {
   south: "Miền Nam",
 };
 
+const SUGGESTION_COUNT = 4;
+
+/** Fisher-Yates shuffle with seed derived from wordId for stable randomness per page */
+function shuffleWithSeed<T>(arr: T[], seed: string): T[] {
+  const copy = [...arr];
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+  }
+  for (let i = copy.length - 1; i > 0; i--) {
+    hash = ((hash << 5) - hash + i) | 0;
+    const j = Math.abs(hash) % (i + 1);
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 export default function WordDetailPage() {
   const params = useParams();
   const wordId = params.id as string;
@@ -45,6 +63,19 @@ export default function WordDetailPage() {
     queryFn: () => getWordDetail(wordId),
     enabled: !!wordId,
   });
+
+  // Fetch random suggestions (browse all, pick random subset excluding current word)
+  const { data: browseResult } = useQuery({
+    queryKey: ["browse-suggestions"],
+    queryFn: () => browseWords({ limit: 50 }),
+    staleTime: 5 * 60 * 1000, // cache 5 min to avoid refetch on every detail view
+  });
+
+  const suggestions: WordBrowseItem[] = useMemo(() => {
+    if (!browseResult?.data || !wordId) return [];
+    const filtered = browseResult.data.filter((w) => w.id !== wordId);
+    return shuffleWithSeed(filtered, wordId).slice(0, SUGGESTION_COUNT);
+  }, [browseResult?.data, wordId]);
 
   if (isLoading) {
     return (
@@ -264,6 +295,65 @@ export default function WordDetailPage() {
                 #{tag}
               </span>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* ═══════ Random Suggestions ═══════ */}
+      {suggestions.length > 0 && (
+        <div className="mt-10 border-t border-border pt-8">
+          <div className="mb-4 flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+              <Shuffle className="h-4 w-4 text-primary" />
+            </div>
+            <h2 className="text-lg font-bold">Gợi ý cho bạn</h2>
+          </div>
+          <p className="mb-4 text-sm text-muted">
+            Khám phá thêm các từ ngữ và câu ký hiệu khác
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {suggestions.map((item) => {
+              const cfg =
+                ENTRY_TYPE_CONFIG[
+                  item.entry_type as keyof typeof ENTRY_TYPE_CONFIG
+                ] || ENTRY_TYPE_CONFIG.word;
+              const SugIcon = cfg.icon;
+              return (
+                <Link
+                  key={item.id}
+                  href={`/dictionary/${item.id}`}
+                  className="group flex items-start gap-3 rounded-xl border border-border bg-surface p-4
+                             transition-all hover:shadow-lg hover:-translate-y-0.5 hover:border-primary/30"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10
+                                  group-hover:bg-primary/20 transition-colors">
+                    <SugIcon className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                      {item.text_vn}
+                    </p>
+                    <div className="mt-1 flex items-center gap-2">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${cfg.color}`}
+                      >
+                        {cfg.label}
+                      </span>
+                      {item.difficulty_level > 0 && (
+                        <span className="text-[10px] text-muted">
+                          {"⭐".repeat(item.difficulty_level)}
+                        </span>
+                      )}
+                    </div>
+                    {item.description && (
+                      <p className="mt-1 text-xs text-muted line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

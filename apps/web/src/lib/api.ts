@@ -32,13 +32,29 @@ async function apiFetch<T>(
 export interface WordSearchResult {
   id: string;
   text_vn: string;
+  entry_type: "word" | "phrase" | "sentence";
   part_of_speech: string | null;
   difficulty_level: number;
+  description: string | null;
 }
 
-export async function searchWords(query: string): Promise<WordSearchResult[]> {
+export interface SearchOptions {
+  limit?: number;
+  entry_type?: string;
+  category?: string;
+}
+
+export async function searchWords(
+  query: string,
+  options: SearchOptions = {},
+): Promise<WordSearchResult[]> {
+  const params = new URLSearchParams({ q: query });
+  if (options.limit) params.set("limit", String(options.limit));
+  if (options.entry_type) params.set("entry_type", options.entry_type);
+  if (options.category) params.set("category", options.category);
+
   const res = await apiFetch<WordSearchResult[]>(
-    `/api/v1/dictionary/search?q=${encodeURIComponent(query)}&limit=10`
+    `/api/v1/dictionary/search?${params.toString()}`
   );
   return res.data;
 }
@@ -57,25 +73,95 @@ export interface SignAsset {
 export interface CanonicalSign {
   id: string;
   variant_name: string | null;
+  region: string | null;
   context_usage: string | null;
   is_default: boolean;
   assets: SignAsset[];
+}
+
+export interface CategoryInfo {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  icon: string | null;
+  display_order: number;
 }
 
 export interface WordDetail {
   id: string;
   text_vn: string;
   normalized_text: string;
+  entry_type: "word" | "phrase" | "sentence";
   part_of_speech: string | null;
   difficulty_level: number;
   semantic_tags: string[] | null;
   description: string | null;
+  categories: CategoryInfo[];
   canonical_signs: CanonicalSign[];
 }
 
 export async function getWordDetail(wordId: string): Promise<WordDetail> {
   const res = await apiFetch<WordDetail>(`/api/v1/dictionary/words/${wordId}`);
   return res.data;
+}
+
+// ── Categories ───────────────────────────────────────────
+
+export interface CategoryWithCount extends CategoryInfo {
+  word_count: number;
+}
+
+export async function getCategories(): Promise<CategoryWithCount[]> {
+  const res = await apiFetch<CategoryWithCount[]>("/api/v1/dictionary/categories");
+  return res.data;
+}
+
+// ── Browse ───────────────────────────────────────────────
+
+export interface WordBrowseItem {
+  id: string;
+  text_vn: string;
+  entry_type: "word" | "phrase" | "sentence";
+  part_of_speech: string | null;
+  difficulty_level: number;
+  description: string | null;
+  has_video: boolean;
+}
+
+export interface BrowseMeta {
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+  filters: {
+    category: string | null;
+    entry_type: string | null;
+  };
+}
+
+export interface BrowseOptions {
+  category?: string;
+  entry_type?: string;
+  page?: number;
+  limit?: number;
+}
+
+export async function browseWords(
+  options: BrowseOptions = {},
+): Promise<{ data: WordBrowseItem[]; meta: BrowseMeta }> {
+  const params = new URLSearchParams();
+  if (options.category) params.set("category", options.category);
+  if (options.entry_type) params.set("entry_type", options.entry_type);
+  if (options.page) params.set("page", String(options.page));
+  if (options.limit) params.set("limit", String(options.limit));
+
+  const res = await apiFetch<WordBrowseItem[]>(
+    `/api/v1/dictionary/browse?${params.toString()}`
+  );
+  return { data: res.data, meta: res.meta as unknown as BrowseMeta };
 }
 
 // ── Translation ──────────────────────────────────────────

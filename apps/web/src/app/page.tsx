@@ -1,5 +1,5 @@
 import { SearchBar } from "@/components/features/dictionary/SearchBar";
-import { Hand, Sparkles, BookOpen, ArrowRight } from "lucide-react";
+import { Hand, Sparkles, BookOpen, ArrowRight, Languages } from "lucide-react";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -29,6 +29,13 @@ export default function HomePage() {
       {/* Feature Cards */}
       <section className="grid gap-4 sm:grid-cols-3">
         <FeatureLink
+          href="/dictionary"
+          icon={<BookOpen className="h-6 w-6" />}
+          title="Từ điển"
+          description="Tra cứu từ vựng, cụm từ và câu thông dụng với video hướng dẫn"
+          color="accent"
+        />
+        <FeatureLink
           href="/alphabet"
           icon={<Hand className="h-6 w-6" />}
           title="Bảng chữ cái"
@@ -36,18 +43,12 @@ export default function HomePage() {
           color="primary"
         />
         <FeatureLink
-          href="/"
-          icon={<BookOpen className="h-6 w-6" />}
-          title="Từ điển đa góc"
-          description="Xem ký hiệu từ nhiều góc nhìn: trước, bên, trên"
-          color="accent"
-        />
-        <FeatureLink
           href="/translate"
-          icon={<Sparkles className="h-6 w-6" />}
+          icon={<Languages className="h-6 w-6" />}
           title="Dịch câu"
           description="Nhập câu tiếng Việt → xem chuỗi ký hiệu tương ứng"
           color="success"
+          badge="Coming Soon"
         />
       </section>
     </div>
@@ -81,7 +82,7 @@ function FeatureLink({
       className="group relative rounded-xl border border-border bg-surface p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-primary/30"
     >
       {badge && (
-        <span className="absolute top-3 right-3 rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-semibold text-accent">
+        <span className="absolute top-3 right-3 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
           {badge}
         </span>
       )}

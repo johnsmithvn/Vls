@@ -6,6 +6,48 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## v1.0.0 — 2026-05-15
+
+### ⚠️ BREAKING CHANGES
+- **DB Migration 002**: `words` table gains `entry_type`, `status`, `contributed_by`, `reviewed_by`, `reviewed_at`, `updated_at` columns. `canonical_signs` gains `region` column. New tables: `categories`, `word_categories`.
+- **Translation page LOCKED**: `/translate` is now a Coming Soon page. All translation components preserved but deactivated.
+- **Nav restructured**: Removed "Sổ tay" from nav. Added "Từ điển" nav item. "Dịch câu" shows "Soon" badge.
+
+### Added
+- **Dictionary Landing Page** (`/dictionary`): Browse UI with category grid, entry_type filter tabs (Từ/Cụm từ/Câu), pagination, and search with type badges.
+- **Categories system**: `categories` + `word_categories` tables for semantic categorization (Y tế, Gia đình, Trường học...).
+- **`entry_type` field**: Words table now distinguishes `word`, `phrase`, `sentence` — "Super Dictionary" concept.
+- **Maker-Checker schema**: `status`, `contributed_by`, `reviewed_by`, `reviewed_at` fields on `words` (DB-only, UI deferred).
+- **Regional dialect support**: `region` field on `canonical_signs` (`north`/`central`/`south`/`standard`).
+- **API endpoints**: `GET /dictionary/categories`, `GET /dictionary/browse` with pagination.
+- **Search filters**: `/dictionary/search` now accepts `entry_type` and `category` query params.
+- **EntryTypeBadge component**: Color-coded badges (🔵 Từ, 🟢 Cụm từ, 🟣 Câu) in search results.
+
+### Changed
+- **Word Detail page** redesigned: entry_type badge, category tags, regional variant tabs (Miền Bắc/Nam/Trung), step timeline indicator.
+- **Home page**: Dictionary card links to `/dictionary`, Dịch câu card shows "Coming Soon" badge.
+- **Header**: Added "Từ điển" nav item, "Dịch câu" shows "Soon" badge, removed "Sổ tay".
+- **Alphabet page**: 3D tab hidden when no model exists (conditional rendering).
+- **API search**: Only returns `status='published'` entries.
+- **Media Storage decision**: Supabase Storage (not public/ folder, not R2).
+
+### Files Modified
+- `apps/api/app/modules/dictionary/models.py` — Word, CanonicalSign, Category, WordCategory models
+- `apps/api/app/modules/dictionary/schemas.py` — Added entry_type, categories, region to DTOs
+- `apps/api/app/modules/dictionary/service.py` — search/browse/categories logic
+- `apps/api/app/modules/dictionary/router.py` — New /categories, /browse endpoints
+- `apps/api/alembic/versions/002_add_entry_type_categories_review.py` — [NEW]
+- `packages/types/src/enums.ts` — Added EntryType, ContentStatus, Region
+- `apps/web/src/lib/api.ts` — New types + API functions
+- `apps/web/src/app/dictionary/page.tsx` — [NEW] Dictionary landing
+- `apps/web/src/app/dictionary/[id]/page.tsx` — Redesigned Word Detail
+- `apps/web/src/app/translate/page.tsx` — Coming Soon UI
+- `apps/web/src/app/page.tsx` — Updated cards + links
+- `apps/web/src/components/shared/layout/Header.tsx` — Nav restructure
+- `apps/web/src/app/alphabet/page.tsx` — Conditional 3D tab
+
+---
+
 ## v0.3.1 — 2026-05-13
 
 ### Added

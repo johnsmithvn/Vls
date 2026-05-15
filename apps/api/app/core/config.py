@@ -9,6 +9,10 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Global application settings."""
 
+    # Server
+    API_HOST: str = "0.0.0.0"
+    API_PORT: int = 8000
+
     # Environment
     ENVIRONMENT: str = "development"
 

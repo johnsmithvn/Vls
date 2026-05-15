@@ -13,7 +13,7 @@
 | Backend Package Manager | **Poetry** |
 | Project Structure | **Monorepo** (pnpm workspace) |
 | Database | **Supabase** (PostgreSQL) |
-| Media Storage | **Cloudflare R2** (Zero Egress Fees) |
+| Media Storage | **Supabase Storage** (Đồng bộ DB/Auth + RLS policies) |
 | Background Jobs | **Celery** + **Upstash Redis** |
 | Containerization | **Docker Compose** (local dev) |
 | Mobile (6-12 tháng sau) | Expo / React Native + shared packages |
@@ -22,20 +22,25 @@
 
 ## 2. PHẠM VI (SCOPE BOUNDARY)
 
-### ✅ IN-SCOPE (Phase 1 MVP)
+### ✅ IN-SCOPE (Phase 1 MVP — v1.0.0 ✅ DONE)
 - Monorepo scaffold (apps/web, apps/api, apps/worker, packages/types).
 - Auth system (Supabase Auth + JWT) — per-user data từ ngày 1.
-- DB Schema 3 lớp: `words` → `canonical_signs` → `sign_assets` + `query_logs`.
-- Bảng chữ cái liên tưởng (29 chữ cái).
-- Tra cứu từ vựng + Auto-suggest.
+- DB Schema: `words` → `canonical_signs` → `sign_assets` + `categories` + `word_categories` + `query_logs`.
+- Bảng chữ cái liên tưởng (29 chữ cái, static JSON).
+- **Từ Điển "Siêu Từ Điển":** Hỗ trợ từ đơn + cụm từ + câu (entry_type).
+  - Browse UI theo chủ đề (category grid).
+  - Search với EntryTypeBadge.
+  - Word Detail với regional variant tabs.
 - Sổ tay cá nhân (Bookmarks per user).
-- Media Upload (Pre-signed URL → R2 → Celery Worker convert).
+- Maker-Checker pipeline schema (DB-only, UI Phase 2).
+- Media Storage: **Supabase Storage** (Signed URL upload).
 
 ### ❌ OUT-OF-SCOPE (Nghiêm cấm trong Phase 1)
-- Sentence Translation (Phase 2).
+- Sentence Translation UI (Phase 2 — trang đã LOCKED, hiện Coming Soon).
 - AI Camera / 3D Avatar (Phase 4-5).
 - RAG / pgvector (Phase 3).
 - Spaced Repetition (Phase 3).
+- Admin Dashboard (Phase 2).
 
 ---
 
@@ -74,14 +79,14 @@
 
 ### Sprint 1.3: Media Pipeline (Tuần 3)
 
-**Mục tiêu:** Upload ảnh/video lên R2 qua Pre-signed URL, Worker tự convert.
+**Mục tiêu:** Upload ảnh/video lên Supabase Storage qua Signed URL, Worker tự convert.
 
 | # | Task | Deliverable |
 |---|---|---|
-| 1 | Tạo Cloudflare R2 bucket + API token. Lưu credentials vào `.env` | R2 accessible |
-| 2 | `modules/media/service.py`: Sinh Pre-signed URL từ R2 (boto3 S3-compatible) | URL hợp lệ, upload thành công |
-| 3 | `modules/media/router.py`: `POST /api/v1/media/upload-url` (Admin-only) | Trả về `{ presigned_url, asset_id }` |
-| 4 | `apps/worker/tasks/media_tasks.py`: Task nhận `asset_id` → download từ R2 → resize/convert → re-upload → update DB | Video `.mp4` tự convert sang `.webm` |
+| 1 | Tạo Supabase Storage bucket `sign-media`. Cấu hình RLS policies | Storage accessible |
+| 2 | `modules/media/service.py`: Sinh Signed URL từ Supabase Storage | URL hợp lệ, upload thành công |
+| 3 | `modules/media/router.py`: `POST /api/v1/media/upload-url` (Admin-only) | Trả về `{ signed_url, asset_id }` |
+| 4 | `apps/worker/tasks/media_tasks.py`: Task nhận `asset_id` → download → resize/convert → re-upload → update DB | Video `.mp4` tự convert sang `.webm` |
 | 5 | Tích hợp trigger: Sau khi upload thành công → Backend enqueue Celery task | Luồng End-to-end hoạt động |
 
 ### Sprint 1.4: Frontend UI (Tuần 4-5)
@@ -108,25 +113,27 @@
 | # | Task | Deliverable |
 |---|---|---|
 | 1 | Script seed 29 chữ cái + hình Mnemonic | DB có 29 words + assets |
-| 2 | Script seed ~100 từ vựng cơ bản + media (ảnh/video) | DB có ~100 words đa góc nhìn |
-| 3 | E2E: Upload Video → R2 → Worker convert → Browser playback | Media Pipeline ổn định |
-| 4 | E2E: Signup → Login → Search → Bookmark → Logout → Login → Bookmark still there | Auth + Notebook ổn định |
-| 5 | Deploy: Supabase (DB) + Railway (API + Worker) + Vercel (Web) + R2 (Media) | Production live |
-| 6 | Config domain + HTTPS + Rate Limiting | Security cơ bản |
+| 2 | Seed 10 categories (Giao tiếp, Gia đình, Trường học, Y tế...) | Browse UI hiện chủ đề |
+| 3 | Script seed ~200-300 từ vựng cơ bản + media (ảnh/video) | DB có core vocabulary |
+| 4 | E2E: Upload Video → Supabase Storage → Worker convert → Browser playback | Media Pipeline ổn định |
+| 5 | E2E: Signup → Login → Search → Bookmark → Logout → Login → Bookmark still there | Auth + Notebook ổn định |
+| 6 | Deploy: Supabase (DB + Storage) + Railway (API + Worker) + Vercel (Web) | Production live |
+| 7 | Config domain + HTTPS + Rate Limiting | Security cơ bản |
 
 ---
 
-## 4. PHASE 2: SENTENCE MAPPING (Rule-based) — ~4 tuần
+## 4. PHASE 2: TRANSLATION + ADMIN — ~4 tuần
 
-**Prerequisite:** Phase 1 hoàn thành, DB có ≥ 100 từ.
+**Prerequisite:** Phase 1 hoàn thành, DB có ≥ 200 từ.
 
 | Sprint | Nội dung | Deliverable |
 |---|---|---|
 | 2.1 | `apps/api/app/ai/semantic/`: Vietnamese Tokenizer (underthesea) + Stop-word removal + Normalizer | Tokenize "Mình đi học nha" → `["Mình", "đi", "học"]` |
 | 2.2 | `modules/translation/`: Grammar Rule Engine (S-V-O → O-S-V reorder) + 3-Tier Resolution logic | API trả đúng `result_type` cho mỗi token |
 | 2.3 | `modules/translation/router.py`: `POST /api/v1/translation/translate` | API endpoint hoạt động < 50ms |
-| 2.4 | `features/translation/SignTimelinePlayer`: Timing Engine (`duration_ms`), Playback controls, Speed selector, Translation Mode Selector | Player phát mượt chuỗi ký hiệu |
+| 2.4 | Unlock `/translate` page: Kích hoạt lại `SignTimelinePlayer` + Translation Mode Selector | Player phát mượt chuỗi ký hiệu |
 | 2.5 | Fingerspell Fallback UI: Visual cue (icon ❓, text mờ) + `query_logs` ghi nhận | User biết đang xem đánh vần, Admin biết từ nào cần bổ sung |
+| 2.6 | Admin Dashboard: Maker-Checker review UI (approve/reject words) + Top fingerspell analytics | Content production pipeline |
 
 ---
 
@@ -163,9 +170,11 @@
 
 ### Automated
 - Pytest cho Backend: API endpoint responses match Standard Contract.
+- `npm run build` phải pass trước mỗi commit.
 - Luồng Grammar Engine: Input → Output mapping chính xác.
 
 ### Manual (User thực hiện)
-- E2E Upload Video → R2 → Worker → Playback trên browser.
+- E2E Upload Video → Supabase Storage → Worker → Playback trên browser.
 - Auth flow: Signup → Login → Bookmark → Logout → Login → Data persisted.
+- Dictionary Browse: Click category → xem danh sách → click từ → xem detail.
 - PWA: Cài lên điện thoại, offline cache hoạt động cho static content.

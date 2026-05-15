@@ -15,7 +15,7 @@ from app.modules.translation.router import router as translation_router
 
 app = FastAPI(
     title="Sign Language OS API",
-    version="0.3.1",
+    version="1.0.0",
     description="Structured Sign Knowledge Graph API",
     docs_url="/api/docs",
     redoc_url="/api/redoc",

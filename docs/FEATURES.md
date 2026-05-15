@@ -19,62 +19,94 @@
 
 ---
 
-## 2. ĐẶC TẢ TÍNH NĂNG (MVP & NEXT)
+## 2. ĐẶC TẢ TÍNH NĂNG
 
-### 2.1. Bảng Chữ Cái Liên Tưởng (Mnemonic Alphabet)
-- **UI:** Grid 29 chữ cái. Component `FlipCard 3D` (Framer Motion).
-- **UX:** Chạm để lật → mặt sau hiện hình ảnh bàn tay lồng ghép đồ vật mnemonic.
+### 2.1. Bảng Chữ Cái Liên Tưởng (Mnemonic Alphabet) ✅
+- **UI:** Grid 29 chữ cái. Modal detail với tabs (Hình ảnh / Video / 3D).
+- **Data:** Static JSON (`src/data/alphabet.json`). Không gọi API.
+- **3D tab:** Chỉ hiện khi `model_3d` có giá trị (conditional rendering).
+- **UX:** Click chữ cái → Modal hiển thị hình ảnh bàn tay + video hướng dẫn.
 
-### 2.2. Tra Cứu Từ Vựng (Word Dictionary)
-- **Hero Search Bar:** Trung tâm màn hình, debounce 300ms, auto-suggest dropdown.
-- **Word Detail Page:**
-  - Khu vực 1: Tên từ (H1) + nút Bookmark.
-  - Khu vực 2: **Polymorphic Media Carousel** (render ảnh/video/3D tùy `media_type`).
-  - Khu vực 3: View Angle Tabs + text mô tả từng bước.
-- **Adaptive Video Strategy:** `WebP animated` (preview nhẹ) → `WebM` (playback) → `MP4` (fallback).
+### 2.2. Từ Điển — "Siêu Từ Điển" ✅ v1.0.0
+Hỗ trợ 3 loại entry: **Từ đơn** (`word`), **Cụm từ** (`phrase`), **Câu thông dụng** (`sentence`).
 
-### 2.3. Dịch Câu — SignTimelinePlayer ✅ IMPLEMENTED
-Đây là **Mini Media Sequencing Engine**, không phải slider ảnh tĩnh.
+#### 2.2.1. Dictionary Landing Page (`/dictionary`)
+- **Search Bar:** Debounce 300ms, auto-suggest dropdown.
+  - Kết quả hiện **EntryTypeBadge** phân biệt loại:
+    - 🔵 Từ — `entry_type = 'word'`
+    - 🟢 Cụm từ — `entry_type = 'phrase'`
+    - 🟣 Câu — `entry_type = 'sentence'`
+- **Category Browse Grid:** Danh sách chủ đề (Y tế 🏥, Gia đình 👨‍👩‍👦, Trường học 🏫...).
+  - Click vào category → hiển thị danh sách từ thuộc category đó.
+  - Mỗi category card hiện icon + tên + số lượng từ.
+- **Entry Type Filter Tabs:** Lọc theo Tất cả / Từ đơn / Cụm từ / Câu.
+- **Pagination:** Phân trang cho danh sách browse.
 
-- **Translation Mode Selector:** ✅ Cho phép user chọn chế độ dịch:
-  | Mode | Mô tả |
-  |---|---|
-  | `Tự động` | Hệ thống tự chọn Tier tốt nhất (mặc định) |
-  | `Từng từ` | Luôn dịch word-by-word, bỏ qua phrase matching |
-  | `Đánh vần` | Luôn fingerspell toàn bộ (dùng khi luyện chữ cái) |
+#### 2.2.2. Word Detail Page (`/dictionary/[id]`)
+- **Header section:**
+  - Tên từ (H1) + EntryTypeBadge + part_of_speech tag
+  - Difficulty level (⭐ rating)
+  - Category tags (clickable, link về browse)
+  - Bookmark button
+- **Regional Variant Tabs:**
+  - Tabs cho Chuẩn / Miền Bắc / Miền Trung / Miền Nam (dùng `region` field)
+  - Default variant highlighted
+- **Media Section:**
+  - **Polymorphic Media Carousel** (render ảnh/video/3D tùy `media_type`)
+  - **Step Timeline:** Nếu ký hiệu gồm nhiều bước (`step_order`), hiện chỉ số bước
+  - **View Angle labels:** Chính diện / Góc nghiêng
+- **Semantic Tags:** Hiển thị tags dạng `#tag`
 
-- **Timing Engine:** ✅ Đọc `duration_ms` từ `metadata` của từng `SignAsset`. Default 1200ms khi thiếu metadata.
-- **Playback Controls:** ✅ Play/Pause, Reset, Speed (0.5x, 1x, 1.5x).
-- **Progress Bar:** ✅ Tiến trình phát tổng thể + token counter + time display.
-- **Active Token Highlighting:** ✅ Auto-scroll + scale effect + pulse indicator.
-- **Fingerspell Visual Cue:** ✅ Khi fallback xuống Tier 3, hiển thị icon ❓ + text mờ: *"Chưa có ký hiệu"*
-- **Translation Result Types** (Backend trả về flag để FE render đúng):
-  | Type | Ý nghĩa |
-  |---|---|
-  | `word_match` | Khớp chính xác trong DB |
-  | `phrase_match` | Khớp cụm từ |
-  | `fingerspell` | Đánh vần từng chữ cái (Fallback cho từ chưa có) |
-  | `ai_generated` | Sinh bởi AI (Phase 3) |
+#### 2.2.3. API Endpoints
+| Endpoint | Mô tả |
+|---|---|
+| `GET /dictionary/search?q=&entry_type=&category=` | Auto-suggest (status=published) |
+| `GET /dictionary/words/{id}` | Chi tiết + variants + assets + categories |
+| `GET /dictionary/categories` | Danh sách chủ đề + word count |
+| `GET /dictionary/browse?category=&entry_type=&page=&limit=` | Browse với pagination |
 
-### 2.4. Sổ Tay & Learning Loop
+### 2.3. Dịch Câu — 🚧 COMING SOON (LOCKED)
+Trang `/translate` hiện tại hiển thị **Coming Soon UI** với navigation cards.
+
+**Thiết kế đã có sẵn (deactivated, chờ data):**
+- **Translation Mode Selector:** Cho phép user chọn chế độ dịch (Tự động / Từng từ / Đánh vần).
+- **SignTimelinePlayer:** Mini Media Sequencing Engine.
+- **3-Tier Resolution:** phrase_match → word_match → fingerspell.
+- **Components bảo lưu:** `TranslationUI`, `TranslationModeSelector`, `SignTimelinePlayer` — sẽ kích hoạt khi có đủ data từ điển.
+
+### 2.4. Sổ Tay & Learning Loop (Phase 2)
+- **Bookmark:** User lưu từ vào sổ tay cá nhân (backend sẵn sàng).
 - **Recent Signs:** Hiển thị trên trang chủ các ký hiệu vừa tra.
 - **Slow-motion Replay & Compare Mode:** Xem chậm thao tác khó.
-- **Spaced Repetition (Tương lai):** Gợi ý ôn tập từ khó.
+- **Spaced Repetition (Phase 3):** Gợi ý ôn tập từ khó.
 
 ---
 
-## 3. CẤU TRÚC COMPONENT FRONTEND
+## 3. MAKER-CHECKER PIPELINE (Schema Ready, UI Phase 2)
+
+Trường `status` trên bảng `words` quản lý luồng kiểm duyệt:
+```
+draft → pending → approved → published
+                           ↘ rejected
+```
+- **MVP:** Seed data mặc định `status = 'published'`. Admin tự quản lý qua DB.
+- **Phase 2:** Admin Dashboard để duyệt nội dung (approve/reject).
+
+---
+
+## 4. CẤU TRÚC COMPONENT FRONTEND
 
 Feature-Based (Không dùng Atomic Design):
 ```text
 src/components/
 ├── features/               # Components nghiệp vụ
-│   ├── dictionary/         # WordDetail, AssetCarousel
-│   ├── translation/        # SignTimelinePlayer, ChatInput
+│   ├── dictionary/         # SearchBar, EntryTypeBadge
+│   ├── hand3d/             # Hand3DViewer (lazy-loaded)
+│   ├── translation/        # SignTimelinePlayer (deactivated)
 │   └── notebook/           # SpacedRepetitionCard
 ├── shared/                 # Dumb components
 │   ├── ui/                 # Button, Input, Skeleton, Modal
-│   └── layout/             # Header, NavigationBar
+│   └── layout/             # Header (4 nav items: Tra cứu, Từ điển, Chữ cái, Dịch câu)
 └── entities/               # MediaRenderer
 ```
 
@@ -83,3 +115,14 @@ Tự quyết định render dựa trên `asset.media_type`:
 - `image` → `<picture>` (WebP + fallback)
 - `video` → `<video autoPlay loop muted playsInline>`
 - `3d_model` → `<Canvas><Model /></Canvas>` (Phase 5)
+
+---
+
+## 5. NAVIGATION STRUCTURE (v1.0.0)
+
+| Nav Item | Path | Status |
+|---|---|---|
+| Tra cứu | `/` | ✅ Active |
+| Từ điển | `/dictionary` | ✅ Active |
+| Chữ cái | `/alphabet` | ✅ Active |
+| Dịch câu | `/translate` | 🚧 Coming Soon (badge) |

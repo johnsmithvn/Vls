@@ -164,3 +164,41 @@
 - [x] Build passed ✓ (6 routes)
 - [ ] **BLOCKER:** Cần file `.glb` model bàn tay — tải từ Sketchfab/HANDZ hoặc tạo trong Blender
 
+## 13. ✅ SPRINT R — V1.0 REFOCUS (DB Redesign + Dictionary + Lock Translation) — DONE
+
+### Sprint R1: DB Schema Redesign
+- [x] `words` table: Thêm `entry_type` (word/phrase/sentence), `status` (draft/pending/approved/published/rejected)
+- [x] `words` table: Thêm `contributed_by`, `reviewed_by`, `reviewed_at`, `updated_at` (Maker-Checker pipeline)
+- [x] `canonical_signs` table: Thêm `region` (north/central/south/standard)
+- [x] Bảng mới `categories` + `word_categories` (many-to-many) cho Browse by topic
+- [x] Alembic migration `002_add_entry_type_categories_review`
+- [x] `packages/types/enums.ts`: Thêm EntryType, ContentStatus, Region
+
+### Sprint R2: Backend API Upgrade
+- [x] `schemas.py`: entry_type, categories, region trong DTOs
+- [x] `service.py`: Search filter by entry_type + category + status=published
+- [x] `service.py`: `browse_words()` với pagination, `get_categories()` với word counts
+- [x] `router.py`: `GET /categories`, `GET /browse` endpoints
+
+### Sprint R3: Frontend — Dictionary Module
+- [x] `api.ts`: Thêm types + endpoints (categories, browse, entry_type)
+- [x] `/dictionary/page.tsx` [NEW]: Landing page với category grid + search + filter tabs + pagination
+- [x] `/dictionary/[id]/page.tsx`: Redesign với variant tabs (region), category tags, step timeline
+- [x] EntryTypeBadge component: Color-coded badges (🔵 Từ / 🟢 Cụm từ / 🟣 Câu)
+
+### Sprint R4: Alphabet Polish
+- [x] Ẩn 3D tab khi `model_3d` = null (conditional rendering)
+
+### Sprint R5: Lock Translation + Nav Cleanup
+- [x] `/translate/page.tsx`: Coming Soon UI với navigation cards
+- [x] `Header.tsx`: Thêm "Từ điển", badge "Soon" trên "Dịch câu", bỏ "Sổ tay"
+- [x] Home `page.tsx`: Dictionary → /dictionary, "Coming Soon" badge trên Dịch câu
+
+### Documentation Sync
+- [x] `DATABASE.md` — Cập nhật toàn bộ schema mới
+- [x] `CHANGELOG.md` — v1.0.0 entry
+- [x] `TASKS.md` — Sprint R tracking
+- [x] `ARCHITECTURE.md` — Cập nhật folder structure, Supabase Storage, migration listing
+- [x] `FEATURES.md` — Cập nhật Super Dictionary, Coming Soon, Maker-Checker
+- [x] `PLAN.md` — Cập nhật roadmap, Supabase Storage, Phase 2 scope
+- [x] Build passed ✓ (7 routes)

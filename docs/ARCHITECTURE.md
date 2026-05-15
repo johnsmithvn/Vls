@@ -34,7 +34,7 @@ Mô hình **Client-Server** kết hợp **Event-Driven Background Processing**.
 | API Gateway | Xử lý nghiệp vụ, xác thực, điều phối dữ liệu | Python FastAPI (DDD) |
 | AI & NLP Engine | Xử lý ngôn ngữ tự nhiên tiếng Việt, RAG (tương lai) | Module nội bộ Backend |
 | Media Pipeline | Xử lý bất đồng bộ file ảnh/video/3D nặng | Celery + Redis |
-| Data Persistence | Dữ liệu cấu trúc + Vector + Object Storage | PostgreSQL + Cloudflare R2 |
+| Data Persistence | Dữ liệu cấu trúc + Vector + Object Storage | PostgreSQL + Supabase Storage |
 
 ---
 
@@ -62,7 +62,7 @@ Mô hình **Client-Server** kết hợp **Event-Driven Background Processing**.
 
 ### 3.3. Storage & Database
 - **Primary DB:** Supabase (PostgreSQL) + extension `pgvector` (bật sẵn cho Phase 3).
-- **Media Storage:** Cloudflare R2 — Zero Egress Fees, Edge caching.
+- **Media Storage:** Supabase Storage — Đồng bộ với DB & Auth, hỗ trợ RLS policies.
 
 ### 3.4. Background Processing
 - **Broker:** Upstash Redis (Serverless).
@@ -119,14 +119,17 @@ apps/api/
 │   │
 │   ├── modules/                 # Domain Driven
 │   │   ├── auth/
-│   │   ├── dictionary/
-│   │   ├── translation/
+│   │   ├── dictionary/          # models: Word, CanonicalSign, SignAsset, Category, WordCategory
+│   │   ├── translation/         # (LOCKED — Coming Soon)
 │   │   ├── notebook/
 │   │   └── media/
 │   │
-│   └── main.py
+│   └── main.py                  # v1.0.0
 │
 ├── alembic/
+│   └── versions/
+│       ├── 001_init_core_schema.py
+│       └── 002_add_entry_type_categories_review.py
 ├── pyproject.toml               # Poetry
 └── alembic.ini
 ```
@@ -145,15 +148,25 @@ apps/worker/
 ```text
 apps/web/src/
 ├── app/                        # Next.js App Router (pages)
+│   ├── page.tsx               # Home (Hero + Feature Cards)
+│   ├── alphabet/page.tsx      # Bảng chữ cái (static JSON)
+│   ├── dictionary/
+│   │   ├── page.tsx           # Dictionary Landing (Browse + Search)
+│   │   └── [id]/page.tsx      # Word Detail (Variant tabs + Media)
+│   ├── translate/page.tsx     # Coming Soon (LOCKED)
+│   └── notebook/page.tsx      # Bookmark list
 ├── components/
 │   ├── features/               # Components nghiệp vụ
-│   │   ├── dictionary/         # WordDetail, AssetCarousel
-│   │   ├── translation/        # SignTimelinePlayer, ChatInput
+│   │   ├── dictionary/         # SearchBar, EntryTypeBadge
+│   │   ├── hand3d/             # Hand3DViewer (lazy-loaded)
+│   │   ├── translation/        # SignTimelinePlayer (deactivated)
 │   │   └── notebook/
 │   ├── shared/                 # Dùng chung
 │   │   ├── ui/                 # Button, Input, Skeleton, Modal
-│   │   └── layout/             # Header, NavigationBar
+│   │   └── layout/             # Header (4 nav items)
 │   └── entities/               # MediaRenderer
+├── data/
+│   └── alphabet.json           # Static alphabet data (B7 rule)
 ├── lib/                        # API client, utilities
 └── stores/                     # Zustand stores
 ```
@@ -163,7 +176,7 @@ apps/web/src/
 packages/types/
 ├── src/
 │   ├── api-responses.ts        # Standard { success, message, data, meta }
-│   ├── enums.ts                # MediaType, ViewAngle, ResultType
+│   ├── enums.ts                # EntryType, ContentStatus, Region, MediaType, TranslationMode...
 │   ├── dictionary.ts           # WordDTO, CanonicalSignDTO, SignAssetDTO
 │   └── translation.ts          # TranslationTokenDTO, TranslationMode
 └── package.json
@@ -171,14 +184,14 @@ packages/types/
 
 ---
 
-## 5. MEDIA PIPELINE (Pre-signed URL Direct Upload)
+## 5. MEDIA PIPELINE (Supabase Storage Direct Upload)
 
 ```text
-[Frontend]                   [Backend API]              [Cloudflare R2]       [Celery Worker]
+[Frontend]                   [Backend API]            [Supabase Storage]    [Celery Worker]
     │                              │                          │                     │
     ├─ POST /media/upload-url ────►│                          │                     │
-    │                              ├─ Tạo Pre-signed URL ────►│                     │
-    │◄─ { presigned_url } ─────────┤                          │                     │
+    │                              ├─ Tạo Signed URL ────────►│                     │
+    │◄─ { signed_url } ───────────┤                          │                     │
     │                              │                          │                     │
     ├─ PUT (Direct Upload) ───────────────────────────────────►│                     │
     │                              │                          │                     │
@@ -268,7 +281,7 @@ Hệ thống tự động **theo dõi log truy vấn** để biết từ nào c�
        │                                           │
        │                                           └──► [ Celery Workers Container ]
        │
-       └──(3) Tải Video/Ảnh───────► [ Cloudflare CDN & R2 Storage ]
+       └──(3) Tải Video/Ảnh───────► [ Supabase Storage + CDN ]
 ```
 
 ---

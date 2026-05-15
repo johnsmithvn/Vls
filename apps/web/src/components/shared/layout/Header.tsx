@@ -6,9 +6,8 @@ import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
   { href: "/", label: "Tra cứu", icon: Search },
-  { href: "/alphabet", label: "Chữ cái", icon: Hand },
-  { href: "/translate", label: "Dịch câu", icon: Languages },
-  { href: "/notebook", label: "Sổ tay", icon: BookOpen },
+  { href: "/dictionary", label: "Từ điển", icon: BookOpen },
+  { href: "/translate", label: "Dịch câu", icon: Languages, badge: "Soon" },
 ];
 
 export function Header() {
@@ -31,12 +30,15 @@ export function Header() {
         <nav className="flex items-center gap-1">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+            const isActive =
+              item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors
                   ${isActive
                     ? "bg-primary/10 text-primary"
                     : "text-muted hover:bg-surface-hover hover:text-foreground"
@@ -44,6 +46,11 @@ export function Header() {
               >
                 <Icon className="h-4 w-4" />
                 <span className="hidden sm:inline">{item.label}</span>
+                {item.badge && (
+                  <span className="absolute -top-1 -right-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[8px] font-bold text-amber-700 leading-none">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           })}

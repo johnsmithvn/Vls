@@ -1,0 +1,60 @@
+# Tích hợp Mô hình 3D Bàn tay (Interactive 3D Viewer)
+
+Mục tiêu: Bổ sung một tab "Mô hình 3D" vào modal chi tiết chữ cái, cho phép người dùng dùng tay/chuột để xoay 360 độ và phóng to/thu nhỏ bàn tay để nhìn rõ cách gập ngón từ mọi góc độ.
+
+## 1. Trả lời câu hỏi cốt lõi
+
+### Có làm được không?
+**Hoàn toàn được và rất mượt!** Trình duyệt hiện đại (cả trên điện thoại) đều hỗ trợ WebGL. Hệ sinh thái React có một thư viện cực kỳ mạnh mẽ để làm việc này là `react-three-fiber` (phiên bản React của Three.js).
+
+### Có nặng không?
+**Không hề nặng nếu tối ưu tốt.**
+- Một mô hình 3D bàn tay định dạng `.glb` (low-poly hoặc mid-poly) chỉ nặng khoảng **100KB - 500KB** (Nhẹ hơn cả một bức ảnh độ phân giải cao).
+- Tốc độ load cực kỳ nhanh, tiêu tốn rất ít RAM và tài nguyên GPU nếu chúng ta không lạm dụng hiệu ứng ánh sáng (shadows/reflections) quá mức.
+
+## 2. Phương pháp triển khai (Technical Approach)
+
+### Stack Công nghệ
+- **Thư viện:** `three`, `@react-three/fiber` (Render engine) và `@react-three/drei` (Cung cấp các công cụ tiện ích như xoay 360 độ `OrbitControls`).
+- **Định dạng file 3D:** `.glb` (GLTF Binary) - Chuẩn tối ưu nhất cho web hiện nay, nén cả lưới 3D, material và texture vào 1 file siêu nhẹ.
+
+### Cách thức hoạt động
+Thay vì dùng code để lập trình tự động gập từng đốt ngón tay (rất phức tạp và thiếu tự nhiên), quy trình hiệu quả nhất là:
+
+1. **Chuẩn bị Model (Phần việc của 3D Artist/Bạn):** 
+   - Lấy 1 mô hình bàn tay 3D có gắn xương (rigged).
+   - Nắn ngón tay thành hình chữ A, Export ra file `a.glb`.
+   - Nắn ngón tay thành hình chữ B, Export ra file `b.glb`.
+   - Tải 22 file `.glb` này vào thư mục `apps/web/public/models/alphabet/`.
+2. **Cập nhật JSON:**
+   - Thêm trường `"model_3d": "/models/alphabet/a.glb"` vào file `alphabet.json`.
+3. **Hiển thị (Phần việc của tôi):**
+   - Viết component `<Hand3DViewer url="/models/alphabet/a.glb" />`.
+   - Component này sẽ render một không gian 3D, load file `.glb` vào chính giữa, đánh sáng đẹp mắt.
+   - Bật tính năng `OrbitControls` cho phép user vuốt để xoay vòng quanh bàn tay.
+
+## 3. Các bước thực hiện (Proposed Changes)
+
+### [MỚI] Cài đặt thư viện
+Cài đặt `three`, `@react-three/fiber` và `@react-three/drei` vào `apps/web`.
+
+### [SỬA] Cấu trúc dữ liệu
+Cập nhật `apps/web/src/data/alphabet.json` và Type định nghĩa để hỗ trợ thẻ `model_3d`.
+
+### [MỚI] Component 3D Viewer
+Tạo file `apps/web/src/components/features/3d/HandModelViewer.tsx`:
+- Render `<Canvas>` của Three.js.
+- Sử dụng `useGLTF` để load file `.glb`.
+- Thiết lập ánh sáng (AmbientLight, DirectionalLight).
+- Tích hợp `<OrbitControls enableZoom={true} />`.
+
+### [SỬA] Modal Chi tiết Chữ cái
+Cập nhật `apps/web/src/app/alphabet/page.tsx`:
+- Thêm nút Tab "Mô hình 3D" (Bên cạnh Hình ảnh và Video).
+- Khi chọn Tab này, load `<HandModelViewer>` và truyền đường dẫn file 3D vào.
+
+> [!IMPORTANT]  
+> **User Review Required**
+> Về mặt kỹ thuật web, tôi có thể code xong toàn bộ tính năng này ngay lập tức. Tuy nhiên, tính năng này sẽ hiển thị một khối vuông trống cho đến khi bạn **cung cấp các file mô hình 3D (.glb)**.
+> 
+> Bạn có sẵn sàng tự nắn 3D trên phần mềm (Blender, Maya...) hoặc tải các mô hình 3D có sẵn trên mạng về không? Nếu bạn đồng ý, tôi sẽ tiến hành cài đặt thư viện và viết code ngay bây giờ!

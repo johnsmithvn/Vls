@@ -1,9 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Hand, PenTool, X } from "lucide-react";
+import { Hand, PenTool, X, Box } from "lucide-react";
 import DATA from "@/data/alphabet.json";
+
+const Hand3DViewer = lazy(
+  () => import("@/components/features/hand3d/Hand3DViewer")
+);
 
 type LetterItem = (typeof DATA.letters)[number] & { video?: string };
 type DiacriticItem =
@@ -12,7 +16,7 @@ type DiacriticItem =
 
 export default function AlphabetPage() {
   const [selectedLetter, setSelectedLetter] = useState<LetterItem | null>(null);
-  const [mediaTab, setMediaTab] = useState<"video" | "image">("image");
+  const [mediaTab, setMediaTab] = useState<"video" | "image" | "3d">("image");
   const [selectedDiacritic, setSelectedDiacritic] =
     useState<DiacriticItem | null>(null);
 
@@ -189,18 +193,18 @@ export default function AlphabetPage() {
 
                 {/* Media preview: Tabs */}
                 <div className="rounded-xl border border-border bg-surface-hover p-2">
-                  {selectedLetter.video && (
-                    <div className="mb-3 flex rounded-lg bg-surface p-1 shadow-sm">
-                      <button
-                        onClick={() => setMediaTab("image")}
-                        className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                          mediaTab === "image"
-                            ? "bg-primary text-primary-foreground shadow-sm"
-                            : "text-muted hover:text-foreground"
-                        }`}
-                      >
-                        Hình ảnh
-                      </button>
+                  <div className="mb-3 flex rounded-lg bg-surface p-1 shadow-sm">
+                    <button
+                      onClick={() => setMediaTab("image")}
+                      className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                        mediaTab === "image"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted hover:text-foreground"
+                      }`}
+                    >
+                      Hình ảnh
+                    </button>
+                    {selectedLetter.video && (
                       <button
                         onClick={() => setMediaTab("video")}
                         className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
@@ -211,8 +215,19 @@ export default function AlphabetPage() {
                       >
                         Video
                       </button>
-                    </div>
-                  )}
+                    )}
+                    <button
+                      onClick={() => setMediaTab("3d")}
+                      className={`flex-1 flex items-center justify-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                        mediaTab === "3d"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted hover:text-foreground"
+                      }`}
+                    >
+                      <Box className="h-3 w-3" />
+                      3D
+                    </button>
+                  </div>
 
                   {mediaTab === "video" && selectedLetter.video && (
                     <div className="overflow-hidden rounded-lg aspect-video bg-black/5">
@@ -249,6 +264,30 @@ export default function AlphabetPage() {
                             alt={`Ký hiệu chữ ${selectedLetter.letter}`}
                             className="h-full w-full object-contain"
                           />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {mediaTab === "3d" && (
+                    <div className="overflow-hidden rounded-lg">
+                      {selectedLetter.model_3d ? (
+                        <Suspense
+                          fallback={
+                            <div className="flex h-72 items-center justify-center bg-slate-900 rounded-lg">
+                              <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+                            </div>
+                          }
+                        >
+                          <Hand3DViewer modelUrl={selectedLetter.model_3d} />
+                        </Suspense>
+                      ) : (
+                        <div className="flex h-72 flex-col items-center justify-center rounded-lg bg-gradient-to-b from-slate-900 to-slate-800 text-white/60">
+                          <Box className="mb-3 h-10 w-10 text-white/30" />
+                          <p className="text-sm font-medium text-white/50">Mô hình 3D</p>
+                          <p className="mt-1 text-xs text-white/30">
+                            Đang chuẩn bị — sắp có!
+                          </p>
                         </div>
                       )}
                     </div>

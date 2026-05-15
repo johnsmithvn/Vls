@@ -16,9 +16,10 @@
 - SignTimelinePlayer + Fingerspelling Fallback.
 - Translation Mode Selector (auto / word_by_word / fingerspell).
 
-### Phase 3: Learning Analytics & AI Coach ← **HIỆN TẠI**
+### Phase 3: Learning Analytics & AI Coach
 - Spaced Repetition, Practice Mode, Compare Mode.
 - RAG (`pgvector`) cho Semantic Translation.
+- **DEFERRED** — chờ có user thật.
 
 ### Phase 4 & 5: Sign Language OS (Research-Level)
 - 3D Avatar Synthesis + AI Camera Recognition.
@@ -150,4 +151,16 @@
 - [x] `api.ts` — `translateText()` accepts mode, `TranslationSignAsset` includes `metadata`
 - [x] `/translate` page — integrated Mode Selector + Player
 - [x] Build passed ✓ (7 routes)
+
+## 12. ✅ SPRINT 3D.1 — 3D Hand Viewer Infrastructure — DONE
+
+- [x] Installed: `three` + `@react-three/fiber` + `@react-three/drei` + `@types/three`
+- [x] `components/features/hand3d/Hand3DViewer.tsx` — Canvas + OrbitControls + auto-rotate + studio lighting
+- [x] Alphabet modal: 3-tab system (Hình ảnh / Video / 3D)
+- [x] `alphabet.json`: `model_3d` field added to all 22 letters (null until .glb files provided)
+- [x] `public/models/alphabet/` directory created
+- [x] Lazy-loaded with `React.lazy()` — zero bundle cost when not used
+- [x] Forward-compatible: same component supports animated .glb (useAnimations) for future translation avatar
+- [x] Build passed ✓ (6 routes)
+- [ ] **BLOCKER:** Cần file `.glb` model bàn tay — tải từ Sketchfab/HANDZ hoặc tạo trong Blender
 

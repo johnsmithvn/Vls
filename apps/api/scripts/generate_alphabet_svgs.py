@@ -48,26 +48,21 @@ def generate_svg(letter: str, mnemonic: str, color: str) -> str:
     if current_line:
         lines.append(current_line)
 
-    text_y_start = 200
-    mnemonic_elements = ""
-    for i, line in enumerate(lines):
-        y = text_y_start + (i * 22)
-        mnemonic_elements += f'    <text x="160" y="{y}" font-family="system-ui, sans-serif" font-size="14" fill="#6b7280" text-anchor="middle">{line}</text>\n'
-
     safe = letter.lower()
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
-  <defs>
-    <linearGradient id="bg_{safe}" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#f5f3ff;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#ede9fe;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <rect width="320" height="320" rx="24" fill="url(#bg_{safe})"/>
-  <circle cx="160" cy="100" r="60" fill="{color}" opacity="0.12"/>
-  <text x="160" y="120" font-family="system-ui, sans-serif" font-size="64" font-weight="bold" fill="{color}" text-anchor="middle" dominant-baseline="middle">{letter}</text>
-  <text x="160" y="170" font-family="system-ui, sans-serif" font-size="11" fill="{color}" text-anchor="middle" opacity="0.7">Ky hieu ngon ngu ky hieu</text>
-{mnemonic_elements}  <rect x="110" y="270" width="100" height="28" rx="14" fill="{color}" opacity="0.1"/>
-  <text x="160" y="288" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="{color}" text-anchor="middle">Xem chi tiet</text>
+  <!-- Nền xanh lá cây giống ảnh mẫu -->
+  <rect width="320" height="320" fill="#397A35"/>
+  
+  <!-- Viền xanh dương đậm giống ảnh mẫu -->
+  <rect x="16" y="16" width="288" height="288" fill="none" stroke="#163C7B" stroke-width="16"/>
+
+  <!-- Vị trí để hình bàn tay (hiện tại để icon màu trắng nổi bật) -->
+  <text x="160" y="130" font-family="system-ui" font-size="100" text-anchor="middle" dominant-baseline="middle" opacity="0.9">✋</text>
+  
+  <!-- Chữ Hoa bên trái (Màu Trắng), Chữ Thường bên phải (Màu Đen) (font Serif) -->
+  <text x="90" y="260" font-family="Georgia, serif" font-size="90" font-weight="bold" fill="#FFFFFF" text-anchor="middle">{letter}</text>
+  <text x="230" y="260" font-family="Georgia, serif" font-size="90" font-weight="bold" fill="#000000" text-anchor="middle">{letter.lower()}</text>
+
 </svg>'''
 
 

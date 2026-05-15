@@ -1,0 +1,136 @@
+# Báo cáo Khả thi: Mô hình 3D Bàn tay cho Sign Language OS
+
+## TL;DR (Kết luận)
+**Hoàn toàn khả thi, có thư viện ngon, không cần tự code từ số 0.** 
+Có **3 hướng triển khai** với mức độ khó tăng dần. Phương án được khuyến nghị là **Phương án A** (đơn giản nhất, hiệu quả nhất cho MVP).
+
+---
+
+## 1. Hệ sinh thái Thư viện (Không cần phát minh lại bánh xe)
+
+Toàn bộ tính năng này được xây trên nền tảng thư viện **đã chín muồi và rất phổ biến** trong cộng đồng React:
+
+| Thư viện | Vai trò | Stars trên GitHub |
+|---|---|---|
+| `three` | Engine render 3D gốc (Three.js) | ~100k ⭐ |
+| `@react-three/fiber` | Wrapper React cho Three.js | ~28k ⭐ |
+| `@react-three/drei` | Bộ công cụ tiện ích (OrbitControls, useGLTF...) | ~8k ⭐ |
+| `gltfjsx` | Chuyển file `.glb` thành React component | ~5k ⭐ |
+
+> [!TIP]
+> Những thư viện này được duy trì bởi nhóm `pmndrs` (Poimandres) — cùng nhóm phát triển `zustand` (state management). Đây là hệ sinh thái 3D uy tín nhất trong React hiện nay, không phải thư viện vô danh.
+
+---
+
+## 2. Ba Phương án Triển khai
+
+### Phương án A: Pre-made Models (File `.glb` tĩnh) ⭐ KHUYẾN NGHỊ
+
+**Ý tưởng:** Tải 1 model bàn tay rigged miễn phí → Mở Blender → Nắn ngón tay thành hình chữ A → Export ra `a.glb`. Lặp lại 22 lần. Web chỉ việc load file và cho user xoay 360°.
+
+| Tiêu chí | Đánh giá |
+|---|---|
+| Độ khó code | ⭐ Rất dễ (~50 dòng code) |
+| Độ khó làm model | ⭐⭐ Trung bình (cần biết Blender cơ bản) |
+| Hiệu năng | ⭐⭐⭐ Cực nhẹ (100-500KB/file, load gần như tức thì) |
+| Chất lượng hình ảnh | ⭐⭐⭐ Rất đẹp (tùy thuộc model gốc) |
+| Thời gian hoàn thành | 2-3 ngày (code 1 ngày + nắn model 1-2 ngày) |
+
+**Nguồn Model miễn phí:**
+- [Sketchfab](https://sketchfab.com) — Tìm "rigged hand" → filter "Downloadable" → tải `.glb`
+- [HANDZ](https://handz.design) — Bộ model tay 3D miễn phí, đã có sẵn nhiều tư thế (pose)
+- [Mixamo](https://mixamo.com) — Upload model tay → auto-rig miễn phí
+
+**Code mẫu (chỉ ~50 dòng):**
+```tsx
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls, useGLTF } from '@react-three/drei'
+
+function HandModel({ url }) {
+  const { scene } = useGLTF(url)
+  return <primitive object={scene} />
+}
+
+export function Hand3DViewer({ modelUrl }) {
+  return (
+    <Canvas camera={{ position: [0, 0, 2] }}>
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[2, 2, 2]} />
+      <HandModel url={modelUrl} />
+      <OrbitControls enableZoom={true} />
+    </Canvas>
+  )
+}
+```
+
+---
+
+### Phương án B: Code-driven Posing (1 Model + 22 bộ Dữ liệu Xương)
+
+**Ý tưởng:** Chỉ tải DUY NHẤT 1 model bàn tay. Thay vì nắn tay trong Blender 22 lần, chúng ta viết code để tự động xoay từng đốt ngón tay dựa trên một file JSON chứa góc xoay (rotation) cho mỗi chữ cái.
+
+| Tiêu chí | Đánh giá |
+|---|---|
+| Độ khó code | ⭐⭐⭐ Cao (xử lý Quaternion, xương cha-con) |
+| Độ khó làm model | ⭐ Dễ (chỉ cần 1 model duy nhất) |
+| Hiệu năng | ⭐⭐⭐ Cực nhẹ (chỉ load 1 file ~200KB, tái sử dụng) |
+| Chất lượng hình ảnh | ⭐⭐ Có thể bị "gãy khớp" nếu tính toán xương sai |
+| Thời gian hoàn thành | 5-7 ngày |
+
+**Ưu điểm lớn nhất:** Chỉ cần 1 file model duy nhất (~200KB). Rất nhẹ, rất tiết kiệm.
+**Nhược điểm:** Tính toán góc xoay xương (bone rotation) cho 22 chữ cái là công việc cực kỳ tỉ mỉ. Nếu sai 1 góc, ngón tay sẽ bị xoắn quẩy rất xấu.
+
+**Thư viện hỗ trợ:**
+- `gltfjsx` — Phân tích cấu trúc xương từ file `.glb`, xuất ra code truy cập từng bone
+- `react-spring` hoặc `framer-motion-3d` — Tạo hiệu ứng chuyển động mượt khi chuyển từ chữ A sang chữ B
+
+---
+
+### Phương án C: AI Webcam Tracking (Nhận diện tay thật → Render 3D)
+
+**Ý tưởng:** Dùng camera điện thoại/laptop của user, bật MediaPipe Hand Tracking, nhận diện 21 điểm xương trên bàn tay thật, rồi "chiếu" hình dáng tay đó lên mô hình 3D trong app. User giơ tay lên → model 3D bắt chước y hệt theo thời gian thực.
+
+| Tiêu chí | Đánh giá |
+|---|---|
+| Độ khó code | ⭐⭐⭐⭐⭐ Rất cao |
+| Hiệu năng | ⭐⭐ Tốn CPU/GPU (xử lý video real-time) |
+| Chất lượng | ⭐⭐⭐ Ấn tượng, WOW effect cực mạnh |
+| Thời gian hoàn thành | 2-4 tuần |
+
+**Thư viện:**
+- `@mediapipe/tasks-vision` — Nhận diện 21 điểm xương 3D trên bàn tay từ camera
+- `Fingerpose` — Phân loại cử chỉ tay thành chữ cái (A-Z)
+
+> [!WARNING]
+> Phương án này rất "WOW" nhưng **KHÔNG NÊN** làm ngay bây giờ. Nó phù hợp làm tính năng "AI Coach" ở Phase 5 (Người dùng giơ tay lên webcam → App chấm điểm tư thế có đúng không).
+
+---
+
+## 3. Khuyến nghị Lộ trình
+
+```mermaid
+flowchart LR
+    A["Phase hiện tại\n(Tuần này)"] --> B["Phase 3\n(Tháng sau)"]
+    B --> C["Phase 5\n(Tương lai)"]
+    
+    A -- "Phương án A\n22 file .glb tĩnh\nUser xoay 360°" --> A
+    B -- "Phương án B\n1 model + JSON pose\nChuyển động mượt A→B" --> B
+    C -- "Phương án C\nAI Webcam Tracking\nChấm điểm tư thế" --> C
+```
+
+### Bước đi ngay bây giờ (Phương án A):
+1. Tôi cài thư viện `three` + `@react-three/fiber` + `@react-three/drei` (~2 phút).
+2. Tôi code component `<Hand3DViewer>` + thêm Tab "3D" vào Modal (~1 giờ).
+3. Bạn tải 1 model bàn tay rigged miễn phí từ Sketchfab hoặc HANDZ.
+4. Bạn mở Blender, nắn tay thành chữ A, export ra `a.glb`, ném vào thư mục `public/models/`.
+5. Refresh trình duyệt → Thấy bàn tay 3D xoay 360° ngay lập tức.
+
+## 4. Tổng kết
+
+| Câu hỏi | Trả lời |
+|---|---|
+| Có làm được không? | ✅ Hoàn toàn được |
+| Có nặng không? | ✅ Rất nhẹ (100-500KB/model) |
+| Có thư viện ngon không? | ✅ Hệ sinh thái `pmndrs` rất mạnh |
+| Có cần tự code engine 3D không? | ❌ Không, chỉ ~50 dòng code |
+| Blocker duy nhất? | ⚠️ Cần file model 3D (.glb) do người làm |

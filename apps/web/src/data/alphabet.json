@@ -6,154 +6,176 @@
       "video": "https://drive.google.com/file/d/1JAEf3N-KNQBPFV0Q_QxoSrhiIZFWiAju/preview",
       "images": [
         "/signs/alphabet/a.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "B",
       "mnemonic": "Bàn tay mở, ngón cái gập",
       "images": [
         "/signs/alphabet/b.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "C",
       "mnemonic": "Bàn tay cong hình chữ C",
       "images": [
         "/signs/alphabet/c.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "D",
       "mnemonic": "Ngón trỏ thẳng, còn lại nắm",
       "images": [
         "/signs/alphabet/d.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "E",
       "mnemonic": "Các ngón gập tạo hình E",
       "images": [
         "/signs/alphabet/e.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "G",
       "mnemonic": "Ngón trỏ + cái chỉ ngang",
       "images": [
         "/signs/alphabet/g.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "H",
       "mnemonic": "Hai ngón trỏ + giữa thẳng",
       "images": [
         "/signs/alphabet/h.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "I",
       "mnemonic": "Ngón út thẳng, còn lại nắm",
       "images": [
         "/signs/alphabet/i.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "K",
       "mnemonic": "Ngón trỏ + giữa chữ V, cái chạm giữa",
       "images": [
         "/signs/alphabet/k.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "L",
       "mnemonic": "Ngón cái + trỏ thẳng góc 90°",
       "images": [
         "/signs/alphabet/l.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "M",
       "mnemonic": "Ba ngón gập trên ngón cái",
       "images": [
         "/signs/alphabet/m.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "N",
       "mnemonic": "Hai ngón gập trên ngón cái",
       "images": [
         "/signs/alphabet/n.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "O",
       "mnemonic": "Các ngón chạm cái tạo hình O",
       "images": [
         "/signs/alphabet/o.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "P",
       "mnemonic": "Giống K, úp xuống",
       "images": [
         "/signs/alphabet/p.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "Q",
       "mnemonic": "Giống G, úp xuống",
       "images": [
         "/signs/alphabet/q.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "R",
       "mnemonic": "Ngón trỏ + giữa bắt chéo",
       "images": [
         "/signs/alphabet/r.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "S",
       "mnemonic": "Nắm tay, ngón cái phía trước",
       "images": [
         "/signs/alphabet/s.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "T",
       "mnemonic": "Ngón cái kẹp giữa trỏ + giữa",
       "images": [
         "/signs/alphabet/t.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "U",
       "mnemonic": "Ngón trỏ + giữa thẳng sát nhau",
       "images": [
         "/signs/alphabet/u.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "V",
       "mnemonic": "Ngón trỏ + giữa xòe hình V",
       "images": [
         "/signs/alphabet/v.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "X",
       "mnemonic": "Ngón trỏ gập hình móc câu",
       "images": [
         "/signs/alphabet/x.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     },
     {
       "letter": "Y",
       "mnemonic": "Ngón cái + út xòe, còn lại nắm",
       "images": [
         "/signs/alphabet/y.svg"
-      ]
+      ],
+      "model_3d": "/models/alphabet/hand_optimized.glb"
     }
   ],
   "diacritics": {

@@ -58,6 +58,21 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## v0.3.0 — 2026-05-14
+
+### Added
+- **3D Hand Viewer** (`Hand3DViewer.tsx`): Three.js-based interactive 3D viewer with OrbitControls, auto-rotate, studio lighting, contact shadows.
+- **Alphabet modal 3D tab**: Users can switch between Hình ảnh / Video / 3D views.
+- **`model_3d` field** in `alphabet.json`: Ready for `.glb` model files.
+- **`public/models/alphabet/`** directory for 3D assets.
+- Dependencies: `three`, `@react-three/fiber`, `@react-three/drei`, `@types/three`.
+
+### Architecture
+- `Hand3DViewer` uses `useGLTF` — forward-compatible with animated models (`useAnimations`) for future translation avatar.
+- Lazy-loaded via `React.lazy()` — zero bundle impact when 3D tab not viewed.
+
+---
+
 ## v0.2.1 — 2026-05-13
 
 ### Added

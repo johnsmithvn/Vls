@@ -5,177 +5,230 @@
       "mnemonic": "Nắm tay, ngón cái sang ngang",
       "video": "https://drive.google.com/file/d/1JAEf3N-KNQBPFV0Q_QxoSrhiIZFWiAju/preview",
       "images": [
-        "/signs/alphabet/a.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_a.png"
+      ]
     },
     {
       "letter": "B",
       "mnemonic": "Bàn tay mở, ngón cái gập",
       "images": [
-        "/signs/alphabet/b.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_b.png"
+      ]
     },
     {
       "letter": "C",
       "mnemonic": "Bàn tay cong hình chữ C",
       "images": [
-        "/signs/alphabet/c.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_c.png"
+      ]
     },
     {
       "letter": "D",
       "mnemonic": "Ngón trỏ thẳng, còn lại nắm",
       "images": [
-        "/signs/alphabet/d.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_d.png"
+      ]
+    },
+    {
+      "letter": "Đ",
+      "mnemonic": "Giống D, ngón trỏ hơi cong",
+      "images": [
+        "/images/alphabet/flashcards/flashcard_dd.png"
+      ]
     },
     {
       "letter": "E",
       "mnemonic": "Các ngón gập tạo hình E",
       "images": [
-        "/signs/alphabet/e.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_e.png"
+      ]
     },
     {
       "letter": "G",
       "mnemonic": "Ngón trỏ + cái chỉ ngang",
       "images": [
-        "/signs/alphabet/g.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_g.png"
+      ]
     },
     {
       "letter": "H",
       "mnemonic": "Hai ngón trỏ + giữa thẳng",
       "images": [
-        "/signs/alphabet/h.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_h.png"
+      ]
     },
     {
       "letter": "I",
       "mnemonic": "Ngón út thẳng, còn lại nắm",
       "images": [
-        "/signs/alphabet/i.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_i.png"
+      ]
     },
     {
       "letter": "K",
       "mnemonic": "Ngón trỏ + giữa chữ V, cái chạm giữa",
       "images": [
-        "/signs/alphabet/k.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_k.png"
+      ]
     },
     {
       "letter": "L",
       "mnemonic": "Ngón cái + trỏ thẳng góc 90°",
       "images": [
-        "/signs/alphabet/l.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_l.png"
+      ]
     },
     {
       "letter": "M",
       "mnemonic": "Ba ngón gập trên ngón cái",
       "images": [
-        "/signs/alphabet/m.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_m.png"
+      ]
     },
     {
       "letter": "N",
       "mnemonic": "Hai ngón gập trên ngón cái",
       "images": [
-        "/signs/alphabet/n.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_n.png"
+      ]
     },
     {
       "letter": "O",
       "mnemonic": "Các ngón chạm cái tạo hình O",
       "images": [
-        "/signs/alphabet/o.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_o.png"
+      ]
     },
     {
       "letter": "P",
       "mnemonic": "Giống K, úp xuống",
       "images": [
-        "/signs/alphabet/p.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_p.png"
+      ]
     },
     {
       "letter": "Q",
       "mnemonic": "Giống G, úp xuống",
       "images": [
-        "/signs/alphabet/q.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_q.png"
+      ]
     },
     {
       "letter": "R",
       "mnemonic": "Ngón trỏ + giữa bắt chéo",
       "images": [
-        "/signs/alphabet/r.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_r.png"
+      ]
     },
     {
       "letter": "S",
       "mnemonic": "Nắm tay, ngón cái phía trước",
       "images": [
-        "/signs/alphabet/s.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_s.png"
+      ]
     },
     {
       "letter": "T",
       "mnemonic": "Ngón cái kẹp giữa trỏ + giữa",
       "images": [
-        "/signs/alphabet/t.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_t.png"
+      ]
     },
     {
       "letter": "U",
       "mnemonic": "Ngón trỏ + giữa thẳng sát nhau",
       "images": [
-        "/signs/alphabet/u.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_u.png"
+      ]
     },
     {
       "letter": "V",
       "mnemonic": "Ngón trỏ + giữa xòe hình V",
       "images": [
-        "/signs/alphabet/v.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_v.png"
+      ]
     },
     {
       "letter": "X",
       "mnemonic": "Ngón trỏ gập hình móc câu",
       "images": [
-        "/signs/alphabet/x.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_x.png"
+      ]
     },
     {
       "letter": "Y",
       "mnemonic": "Ngón cái + út xòe, còn lại nắm",
       "images": [
-        "/signs/alphabet/y.svg"
-      ],
-      "model_3d": "/models/alphabet/hand_optimized.glb"
+        "/images/alphabet/flashcards/flashcard_y.png"
+      ]
+    }
+  ],
+  "numbers": [
+    {
+      "number": "0",
+      "label": "số không",
+      "mnemonic": "Các ngón chạm cái tạo hình O",
+      "images": ["/images/alphabet/flashcards/flashcard_0.png"]
+    },
+    {
+      "number": "1",
+      "label": "một",
+      "mnemonic": "Ngón trỏ giơ thẳng lên",
+      "images": ["/images/alphabet/flashcards/flashcard_1.png"]
+    },
+    {
+      "number": "2",
+      "label": "hai",
+      "mnemonic": "Ngón trỏ + giữa giơ thẳng",
+      "images": ["/images/alphabet/flashcards/flashcard_2.png"]
+    },
+    {
+      "number": "3",
+      "label": "ba",
+      "mnemonic": "Ngón cái + trỏ + giữa giơ thẳng",
+      "images": ["/images/alphabet/flashcards/flashcard_3.png"]
+    },
+    {
+      "number": "4",
+      "label": "bốn",
+      "mnemonic": "Bốn ngón giơ thẳng, cái gập",
+      "images": ["/images/alphabet/flashcards/flashcard_4.png"]
+    },
+    {
+      "number": "5",
+      "label": "năm",
+      "mnemonic": "Xòe cả bàn tay",
+      "images": ["/images/alphabet/flashcards/flashcard_5.png"]
+    },
+    {
+      "number": "6",
+      "label": "sáu",
+      "mnemonic": "Ngón cái + út xòe ra",
+      "images": ["/images/alphabet/flashcards/flashcard_6.png"]
+    },
+    {
+      "number": "7",
+      "label": "bảy",
+      "mnemonic": "Ngón cái + trỏ + út xòe ra",
+      "images": ["/images/alphabet/flashcards/flashcard_7.png"]
+    },
+    {
+      "number": "8",
+      "label": "tám",
+      "mnemonic": "Ngón cái + trỏ + giữa xòe ra",
+      "images": ["/images/alphabet/flashcards/flashcard_8.png"]
+    },
+    {
+      "number": "9",
+      "label": "chín",
+      "mnemonic": "Bốn ngón giơ, trỏ gập móc câu",
+      "images": ["/images/alphabet/flashcards/flashcard_9.png"]
+    },
+    {
+      "number": "10",
+      "label": "mười",
+      "mnemonic": "Nắm tay, ngón cái giơ lên",
+      "images": ["/images/alphabet/flashcards/flashcard_10.png"]
     }
   ],
   "diacritics": {
@@ -190,7 +243,7 @@
         ],
         "gesture": "Ngón trỏ vẽ hình tam giác nhỏ (^) phía trên, sau khi ra ký hiệu chữ cái gốc",
         "images": [
-          "/signs/diacritics/dau_mu.svg"
+          "/images/alphabet/flashcards/flashcard_a_circumflex.png"
         ]
       },
       {
@@ -201,7 +254,7 @@
         ],
         "gesture": "Ngón trỏ vẽ hình cung tròn (˘) phía trên, sau khi ra ký hiệu chữ A",
         "images": [
-          "/signs/diacritics/dau_trang.svg"
+          "/images/alphabet/flashcards/flashcard_a_breve.png"
         ]
       },
       {
@@ -213,7 +266,7 @@
         ],
         "gesture": "Ngón trỏ vẽ nét móc nhỏ bên phải, sau khi ra ký hiệu chữ cái gốc",
         "images": [
-          "/signs/diacritics/dau_moc.svg"
+          "/images/alphabet/flashcards/flashcard_o_horn.png"
         ]
       },
       {
@@ -224,7 +277,7 @@
         ],
         "gesture": "Ngón trỏ gạch ngang qua, sau khi ra ký hiệu chữ D",
         "images": [
-          "/signs/diacritics/dau_gach.svg"
+          "/images/alphabet/flashcards/flashcard_dd.png"
         ]
       }
     ],
@@ -234,45 +287,35 @@
         "name": "Dấu sắc (´)",
         "example": "a → á",
         "gesture": "Ngón trỏ vạch chéo lên từ trái sang phải (/)",
-        "images": [
-          "/signs/diacritics/dau_sac.svg"
-        ]
+        "images": []
       },
       {
         "id": "dau_huyen",
         "name": "Dấu huyền (`)",
         "example": "a → à",
         "gesture": "Ngón trỏ vạch chéo xuống từ trái sang phải (\\)",
-        "images": [
-          "/signs/diacritics/dau_huyen.svg"
-        ]
+        "images": []
       },
       {
         "id": "dau_hoi",
         "name": "Dấu hỏi (?)",
         "example": "a → ả",
         "gesture": "Ngón trỏ vẽ hình dấu hỏi nhỏ (?) phía trên",
-        "images": [
-          "/signs/diacritics/dau_hoi.svg"
-        ]
+        "images": []
       },
       {
         "id": "dau_nga",
         "name": "Dấu ngã (~)",
         "example": "a → ã",
         "gesture": "Ngón trỏ vẽ hình sóng (~) ngang",
-        "images": [
-          "/signs/diacritics/dau_nga.svg"
-        ]
+        "images": []
       },
       {
         "id": "dau_nang",
         "name": "Dấu nặng (.)",
         "example": "a → ạ",
         "gesture": "Ngón trỏ chấm xuống một điểm phía dưới",
-        "images": [
-          "/signs/diacritics/dau_nang.svg"
-        ]
+        "images": []
       }
     ]
   }

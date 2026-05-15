@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Hand, PenTool, X, Box } from "lucide-react";
+import { Hand, PenTool, X, ChevronLeft, ChevronRight, Hash } from "lucide-react";
 import DATA from "@/data/alphabet.json";
 
-const Hand3DViewer = lazy(
-  () => import("@/components/features/hand3d/Hand3DViewer")
-);
+
 
 type LetterItem = (typeof DATA.letters)[number] & { video?: string };
+type NumberItem = (typeof DATA.numbers)[number];
 type DiacriticItem =
   | (typeof DATA.diacritics.letter_modifiers)[number]
   | (typeof DATA.diacritics.tone_marks)[number];
@@ -19,6 +18,55 @@ export default function AlphabetPage() {
   const [mediaTab, setMediaTab] = useState<"video" | "image" | "3d">("image");
   const [selectedDiacritic, setSelectedDiacritic] =
     useState<DiacriticItem | null>(null);
+  const [selectedNumber, setSelectedNumber] = useState<NumberItem | null>(null);
+
+  // Prev/Next for letters
+  const currentLetterIndex = selectedLetter
+    ? DATA.letters.findIndex((l) => l.letter === selectedLetter.letter)
+    : -1;
+  const goToLetter = useCallback((dir: -1 | 1) => {
+    setSelectedLetter((prev) => {
+      if (!prev) return null;
+      const idx = DATA.letters.findIndex((l) => l.letter === prev.letter);
+      const next = idx + dir;
+      if (next < 0 || next >= DATA.letters.length) return prev;
+      setMediaTab("image");
+      return DATA.letters[next] as LetterItem;
+    });
+  }, []);
+
+  // Prev/Next for numbers
+  const currentNumberIndex = selectedNumber
+    ? DATA.numbers.findIndex((n) => n.number === selectedNumber.number)
+    : -1;
+  const goToNumber = useCallback((dir: -1 | 1) => {
+    setSelectedNumber((prev) => {
+      if (!prev) return null;
+      const idx = DATA.numbers.findIndex((n) => n.number === prev.number);
+      const next = idx + dir;
+      if (next < 0 || next >= DATA.numbers.length) return prev;
+      return DATA.numbers[next] as NumberItem;
+    });
+  }, []);
+
+  // Keyboard arrow navigation
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (selectedLetter) {
+        if (e.key === "ArrowLeft") goToLetter(-1);
+        if (e.key === "ArrowRight") goToLetter(1);
+        if (e.key === "Escape") setSelectedLetter(null);
+      }
+      if (selectedNumber) {
+        if (e.key === "ArrowLeft") goToNumber(-1);
+        if (e.key === "ArrowRight") goToNumber(1);
+        if (e.key === "Escape") setSelectedNumber(null);
+      }
+      if (selectedDiacritic && e.key === "Escape") setSelectedDiacritic(null);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [selectedLetter, selectedNumber, selectedDiacritic, goToLetter, goToNumber]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -148,9 +196,44 @@ export default function AlphabetPage() {
         </div>
       </div>
 
+      {/* ═══════════════ SECTION 4: Numbers ═══════════════ */}
+      <div className="mt-12">
+        <div className="mb-4 flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10">
+            <Hash className="h-4 w-4 text-amber-600" />
+          </div>
+          <h2 className="text-lg font-bold">Số tự nhiên (0–10)</h2>
+        </div>
+        <p className="mb-4 text-sm text-muted">
+          Cách biểu thị số bằng tay. Nhấn vào thẻ để xem chi tiết.
+        </p>
+        <div className="grid grid-cols-4 gap-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-11">
+          {DATA.numbers.map((item, i) => (
+            <motion.button
+              key={item.number}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.03 }}
+              onClick={() => setSelectedNumber(item)}
+              className="group flex flex-col items-center justify-center rounded-2xl border border-border
+                         bg-surface p-4 shadow-sm transition-all
+                         hover:shadow-lg hover:-translate-y-1 hover:border-amber-400
+                         active:scale-95 cursor-pointer"
+            >
+              <span className="text-3xl font-bold text-amber-600 sm:text-4xl group-hover:scale-110 transition-transform">
+                {item.number}
+              </span>
+              <span className="mt-1 text-[10px] text-muted">
+                {item.label}
+              </span>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
       {/* Hint */}
       <p className="mt-8 text-center text-xs text-muted">
-        Nhấn vào bất kỳ thẻ nào để xem chi tiết cách ra ký hiệu
+        Nhấn vào bất kỳ thẻ nào để xem chi tiết · Dùng phím ← → để chuyển
       </p>
 
       {/* ═══════════════ Letter Detail Modal ═══════════════ */}
@@ -173,10 +256,30 @@ export default function AlphabetPage() {
             >
               <button
                 onClick={() => setSelectedLetter(null)}
-                className="absolute right-4 top-4 rounded-lg p-1.5 text-muted hover:bg-surface-hover transition-colors"
+                className="absolute right-4 top-4 rounded-lg p-1.5 text-muted hover:bg-surface-hover transition-colors z-10"
               >
                 <X className="h-5 w-5" />
               </button>
+
+              {/* Prev/Next arrows */}
+              {currentLetterIndex > 0 && (
+                <button
+                  onClick={() => goToLetter(-1)}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-surface border border-border p-2 shadow-md text-muted hover:text-foreground hover:bg-surface-hover transition-colors z-10"
+                  title="Chữ trước (←)"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+              )}
+              {currentLetterIndex < DATA.letters.length - 1 && (
+                <button
+                  onClick={() => goToLetter(1)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-surface border border-border p-2 shadow-md text-muted hover:text-foreground hover:bg-surface-hover transition-colors z-10"
+                  title="Chữ sau (→)"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              )}
 
               <div className="text-center">
                 {/* Letter badge */}
@@ -214,19 +317,6 @@ export default function AlphabetPage() {
                         }`}
                       >
                         Video
-                      </button>
-                    )}
-                    {selectedLetter.model_3d && (
-                      <button
-                        onClick={() => setMediaTab("3d")}
-                        className={`flex-1 flex items-center justify-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                          mediaTab === "3d"
-                            ? "bg-primary text-primary-foreground shadow-sm"
-                            : "text-muted hover:text-foreground"
-                        }`}
-                      >
-                        <Box className="h-3 w-3" />
-                        3D
                       </button>
                     )}
                   </div>
@@ -271,29 +361,6 @@ export default function AlphabetPage() {
                     </div>
                   )}
 
-                  {mediaTab === "3d" && (
-                    <div className="overflow-hidden rounded-lg">
-                      {selectedLetter.model_3d ? (
-                        <Suspense
-                          fallback={
-                            <div className="flex h-72 items-center justify-center bg-slate-900 rounded-lg">
-                              <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
-                            </div>
-                          }
-                        >
-                          <Hand3DViewer modelUrl={selectedLetter.model_3d} />
-                        </Suspense>
-                      ) : (
-                        <div className="flex h-72 flex-col items-center justify-center rounded-lg bg-gradient-to-b from-slate-900 to-slate-800 text-white/60">
-                          <Box className="mb-3 h-10 w-10 text-white/30" />
-                          <p className="text-sm font-medium text-white/50">Mô hình 3D</p>
-                          <p className="mt-1 text-xs text-white/30">
-                            Đang chuẩn bị — sắp có!
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
 
                 {/* How-to */}
@@ -305,6 +372,11 @@ export default function AlphabetPage() {
                     {selectedLetter.mnemonic}
                   </p>
                 </div>
+
+                {/* Counter */}
+                <p className="mt-4 text-[10px] text-muted">
+                  {currentLetterIndex + 1} / {DATA.letters.length} · Dùng phím ← → để chuyển
+                </p>
               </div>
             </motion.div>
           </motion.div>
@@ -378,6 +450,88 @@ export default function AlphabetPage() {
                     {selectedDiacritic.gesture}
                   </p>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ═══════════════ Number Detail Modal ═══════════════ */}
+      <AnimatePresence>
+        {selectedNumber && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedNumber(null)}
+          >
+            <motion.div
+              className="relative w-full max-w-md rounded-2xl border border-border bg-surface p-8 shadow-2xl"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedNumber(null)}
+                className="absolute right-4 top-4 rounded-lg p-1.5 text-muted hover:bg-surface-hover transition-colors z-10"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              {currentNumberIndex > 0 && (
+                <button
+                  onClick={() => goToNumber(-1)}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-surface border border-border p-2 shadow-md text-muted hover:text-foreground hover:bg-surface-hover transition-colors z-10"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+              )}
+              {currentNumberIndex < DATA.numbers.length - 1 && (
+                <button
+                  onClick={() => goToNumber(1)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-surface border border-border p-2 shadow-md text-muted hover:text-foreground hover:bg-surface-hover transition-colors z-10"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              )}
+
+              <div className="text-center">
+                <div className="mb-5 inline-flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 ring-2 ring-amber-500/10">
+                  <span className="text-6xl font-extrabold text-amber-600">
+                    {selectedNumber.number}
+                  </span>
+                </div>
+
+                <h2 className="mb-1 text-2xl font-bold">
+                  Số {selectedNumber.number} — {selectedNumber.label}
+                </h2>
+                <p className="text-muted mb-5">{selectedNumber.mnemonic}</p>
+
+                <div className="rounded-xl border border-border bg-surface-hover p-2">
+                  <div className="flex h-48 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
+                    <img
+                      src={selectedNumber.images[0]}
+                      alt={`Ký hiệu số ${selectedNumber.number}`}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-5 rounded-xl border border-amber-100 bg-amber-50/50 p-4 text-left">
+                  <p className="text-xs font-semibold text-amber-600 uppercase tracking-wider mb-1">
+                    Cách ra ký hiệu
+                  </p>
+                  <p className="text-sm text-foreground">
+                    {selectedNumber.mnemonic}
+                  </p>
+                </div>
+
+                <p className="mt-4 text-[10px] text-muted">
+                  {currentNumberIndex + 1} / {DATA.numbers.length} · Dùng phím ← → để chuyển
+                </p>
               </div>
             </motion.div>
           </motion.div>

@@ -186,6 +186,11 @@ export default function AlphabetPage() {
         </p>
       </div>
 
+      {/* ═══════════════ SECTION: Name Spelling ═══════════════ */}
+      <div className="mb-10">
+        <NameSpeller />
+      </div>
+
       {/* MASTER-DETAIL LAYOUT */}
       <div className="flex flex-col md:flex-row gap-8 mb-16">
         
@@ -429,10 +434,6 @@ export default function AlphabetPage() {
         </div>
       </div>
 
-      {/* ═══════════════ SECTION: Name Spelling ═══════════════ */}
-      <div className="mb-10">
-        <NameSpeller />
-      </div>
 
       {/* ═══════════════ SECTION: Information ═══════════════ */}
       <div className="mb-8 overflow-hidden rounded-2xl bg-sky-50 p-6 text-sky-900 shadow-sm border border-sky-100 dark:bg-sky-950/20 dark:text-sky-100 dark:border-sky-900/50">
@@ -454,10 +455,10 @@ export default function AlphabetPage() {
             <li>Khi cần biểu đạt khái niệm mà bạn không biết ký hiệu</li>
           </ul>
           <p>
-            Khi đánh vần, bạn phải đánh vần chữ cái trước và các thanh (sắc, huyền, hỏi, ngã, nặng) bỏ sau cùng.
+            Khi đánh vần, bạn phải đánh vần tất cả các chữ cái cơ bản của từ trước, sau đó biểu diễn lần lượt các dấu phụ (dấu mũ, trăng, móc) theo thứ tự từ trái sang phải, và cuối cùng mới bỏ dấu thanh (sắc, huyền, hỏi, ngã, nặng) ở cuối từ.
           </p>
           <p className="rounded-lg bg-sky-100/50 p-3 italic dark:bg-sky-900/50">
-            Ví dụ: &quot;Hà Nội&quot; sẽ được đánh vần theo thứ tự sau: <strong>H | A | Dấu Huyền | (ngắt chữ) | N | Ô | I | Dấu nặng</strong>
+            Ví dụ: &quot;Hà Nội&quot; sẽ được đánh vần theo thứ tự sau: <strong>H | A | Dấu huyền | (ngắt chữ) | N | O | I | Dấu mũ | Dấu nặng</strong>
           </p>
           <div className="pt-2">
             <p className="font-semibold text-sky-900 dark:text-sky-100 mb-2">Khoảng cách giữa 2 từ sẽ được thể hiện bằng những cách sau:</p>

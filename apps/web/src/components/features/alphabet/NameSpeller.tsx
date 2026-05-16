@@ -14,10 +14,10 @@ import DATA from "@/data/alphabet.json";
 /**
  * Vietnamese character decomposition rules for fingerspelling.
  *
- * Rule: Extended letters (Đ, Ô, Ă, Â, Ê, Ơ, Ư) are atomic — they have
- * dedicated VSL hand signs. Only tone marks are separated to the end of each word.
+ * Rule: Spell all base letters in a word first → letter modifiers (mũ, trăng, móc) in order → tone mark last.
+ * (Note: "Đ" is an exception, it is a base letter with its own sign).
  * Example: "Hà" → H + A + Dấu huyền (`)
- *          "Nội" → N + Ô + I + Dấu nặng (.)
+ *          "Nội" → N + O + I + Dấu mũ (^) + Dấu nặng (.)
  *          "Đỗ"  → Đ + O + Dấu ngã (~)
  */
 
@@ -68,6 +68,16 @@ for (const [mark, name, gesture] of toneMarks) {
   toneMap.set(mark, { name, gesture });
 }
 
+const modifierMap = new Map<string, { name: string; gesture: string }>();
+const modifiers: [string, string, string][] = [
+  ["\u0302", "Dấu mũ (^)", "Ngón trỏ vẽ hình tam giác nhỏ (^) phía trên"],
+  ["\u0306", "Dấu trăng (˘)", "Ngón trỏ vẽ hình cung tròn (˘) phía trên"],
+  ["\u031B", "Dấu móc (̛)", "Ngón trỏ móc nhẹ về phía bên phải"],
+];
+for (const [mark, name, gesture] of modifiers) {
+  modifierMap.set(mark, { name, gesture });
+}
+
 /**
  * Decompose a Vietnamese string into SpellStep[].
  * Uses Unicode NFD normalization to split base char + combining marks.
@@ -91,6 +101,8 @@ function decomposeVietnamese(text: string): SpellStep[] {
     const nfd = word.normalize("NFD");
 
     let pendingTone: ToneInfo | null = null;
+    const pendingModifiers: { name: string; gesture: string }[] = [];
+    const wordSteps: SpellStep[] = [];
     let i = 0;
 
     while (i < nfd.length) {
@@ -105,29 +117,8 @@ function decomposeVietnamese(text: string): SpellStep[] {
       }
 
       // Check if it's a combining circumflex/breve/horn (letter modifier)
-      // \u0302 = circumflex, \u0306 = breve, \u031B = horn
-      if (char === "\u0302" || char === "\u0306" || char === "\u031B") {
-        // These combine with the previous base char to form an extended letter
-        const prevStep = steps[steps.length - 1];
-        if (prevStep && prevStep.type === "letter") {
-          const combined =
-            char === "\u0302"
-              ? prevStep.label + "\u0302" // → Â, Ê, Ô
-              : char === "\u0306"
-                ? prevStep.label + "\u0306" // → Ă
-                : prevStep.label + "\u031B"; // → Ơ, Ư
-          const normalized = combined.normalize("NFC").toUpperCase();
-          const lData = letterMap.get(normalized);
-          if (lData) {
-            // Replace the base letter step with the extended letter step
-            steps[steps.length - 1] = {
-              label: normalized,
-              image: lData.image,
-              type: "letter",
-              hint: lData.mnemonic,
-            };
-          }
-        }
+      if (modifierMap.has(char)) {
+        pendingModifiers.push(modifierMap.get(char)!);
         i++;
         continue;
       }
@@ -136,7 +127,7 @@ function decomposeVietnamese(text: string): SpellStep[] {
       // Special case: Đ (already has its own entry)
       if (upper === "Đ" || (upper === "D" && nfd[i + 1] === "\u0335")) {
         const dData = letterMap.get("Đ");
-        steps.push({
+        wordSteps.push({
           label: "Đ",
           image: dData?.image || null,
           type: "letter",
@@ -149,7 +140,7 @@ function decomposeVietnamese(text: string): SpellStep[] {
 
       if (letterMap.has(upper)) {
         const lData = letterMap.get(upper)!;
-        steps.push({
+        wordSteps.push({
           label: upper,
           image: lData.image,
           type: "letter",
@@ -157,7 +148,7 @@ function decomposeVietnamese(text: string): SpellStep[] {
         });
       } else if (/[a-zA-Z]/.test(char)) {
         // Unknown letter (F, J, W, Z) — no VSL sign, show placeholder
-        steps.push({
+        wordSteps.push({
           label: upper,
           image: null,
           type: "letter",
@@ -166,6 +157,19 @@ function decomposeVietnamese(text: string): SpellStep[] {
       }
       // Skip non-letter characters (numbers, punctuation, etc.)
       i++;
+    }
+
+    // Push base letters first
+    steps.push(...wordSteps);
+
+    // Push letter modifiers (mũ, trăng, móc)
+    for (const mod of pendingModifiers) {
+      steps.push({
+        label: mod.name,
+        image: null,
+        type: "modifier",
+        hint: mod.gesture,
+      });
     }
 
     // Add tone mark at the end of the word (Vietnamese rule)

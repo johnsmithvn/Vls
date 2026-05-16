@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+
 import {
   Sparkles,
   ChevronLeft,
@@ -14,10 +14,11 @@ import DATA from "@/data/alphabet.json";
 /**
  * Vietnamese character decomposition rules for fingerspelling.
  *
- * Rule: Spell base letters first → letter modifiers → tone mark last.
- * Example: "Ấ" → A + Dấu mũ (^) + Dấu sắc (´)
- *          "Hà" → H + A + Dấu huyền (`)
- *          "Nội" → N + O + Dấu mũ (^) + I + Dấu nặng (.)
+ * Rule: Extended letters (Đ, Ô, Ă, Â, Ê, Ơ, Ư) are atomic — they have
+ * dedicated VSL hand signs. Only tone marks are separated to the end of each word.
+ * Example: "Hà" → H + A + Dấu huyền (`)
+ *          "Nội" → N + Ô + I + Dấu nặng (.)
+ *          "Đỗ"  → Đ + O + Dấu ngã (~)
  */
 
 interface SpellStep {
@@ -38,62 +39,6 @@ for (const l of DATA.letters) {
   letterMap.set(l.letter.toUpperCase(), {
     image: l.images?.[0] || "",
     mnemonic: l.mnemonic,
-  });
-}
-
-// Modifier map: modified char → { base, modifierName, modifierImage }
-interface ModifierInfo {
-  base: string;
-  modifierName: string;
-  modifierImage: string;
-}
-const modifierMap = new Map<string, ModifierInfo>();
-// Â, Ê, Ô → Dấu mũ (^)
-const circumflex = DATA.diacritics.letter_modifiers.find(
-  (m) => m.id === "dau_mu",
-);
-if (circumflex) {
-  modifierMap.set("Â", {
-    base: "A",
-    modifierName: "Dấu mũ (^)",
-    modifierImage: circumflex.images?.[0] || "",
-  });
-  modifierMap.set("Ê", {
-    base: "E",
-    modifierName: "Dấu mũ (^)",
-    modifierImage: circumflex.images?.[0] || "",
-  });
-  modifierMap.set("Ô", {
-    base: "O",
-    modifierName: "Dấu mũ (^)",
-    modifierImage: circumflex.images?.[0] || "",
-  });
-}
-// Ă → Dấu trăng (˘)
-const breve = DATA.diacritics.letter_modifiers.find(
-  (m) => m.id === "dau_trang",
-);
-if (breve) {
-  modifierMap.set("Ă", {
-    base: "A",
-    modifierName: "Dấu trăng (˘)",
-    modifierImage: breve.images?.[0] || "",
-  });
-}
-// Ơ, Ư → Dấu móc
-const horn = DATA.diacritics.letter_modifiers.find(
-  (m) => m.id === "dau_moc",
-);
-if (horn) {
-  modifierMap.set("Ơ", {
-    base: "O",
-    modifierName: "Dấu móc",
-    modifierImage: horn.images?.[0] || "",
-  });
-  modifierMap.set("Ư", {
-    base: "U",
-    modifierName: "Dấu móc",
-    modifierImage: horn.images?.[0] || "",
   });
 }
 
@@ -162,9 +107,7 @@ function decomposeVietnamese(text: string): SpellStep[] {
       // Check if it's a combining circumflex/breve/horn (letter modifier)
       // \u0302 = circumflex, \u0306 = breve, \u031B = horn
       if (char === "\u0302" || char === "\u0306" || char === "\u031B") {
-        // These are handled by looking at previous base char
-        // The modifier step was already pushed or will be pushed
-        // Find what base letter this applies to
+        // These combine with the previous base char to form an extended letter
         const prevStep = steps[steps.length - 1];
         if (prevStep && prevStep.type === "letter") {
           const combined =
@@ -174,14 +117,15 @@ function decomposeVietnamese(text: string): SpellStep[] {
                 ? prevStep.label + "\u0306" // → Ă
                 : prevStep.label + "\u031B"; // → Ơ, Ư
           const normalized = combined.normalize("NFC").toUpperCase();
-          const modInfo = modifierMap.get(normalized);
-          if (modInfo) {
-            steps.push({
-              label: modInfo.modifierName,
-              image: modInfo.modifierImage,
-              type: "modifier",
-              hint: `Thêm ${modInfo.modifierName} sau chữ ${prevStep.label}`,
-            });
+          const lData = letterMap.get(normalized);
+          if (lData) {
+            // Replace the base letter step with the extended letter step
+            steps[steps.length - 1] = {
+              label: normalized,
+              image: lData.image,
+              type: "letter",
+              hint: lData.mnemonic,
+            };
           }
         }
         i++;
@@ -349,44 +293,28 @@ export default function NameSpeller() {
       </div>
 
       {/* Loading */}
-      <AnimatePresence>
-        {isGenerating && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-6 flex flex-col items-center gap-3 py-8"
-          >
-            <div className="flex gap-1">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <motion.div
-                  key={i}
-                  className="h-3 w-3 rounded-full bg-emerald-400"
-                  animate={{ y: [0, -12, 0] }}
-                  transition={{
-                    duration: 0.6,
-                    delay: i * 0.1,
-                    repeat: Infinity,
-                  }}
-                />
-              ))}
-            </div>
-            <p className="text-sm font-medium text-emerald-600">
-              Đang phân tích &quot;{input}&quot;...
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {isGenerating && (
+        <div className="mt-6 flex flex-col items-center gap-3 py-8">
+          <div className="flex gap-1">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="h-3 w-3 rounded-full bg-emerald-400"
+                style={{
+                  animation: `nameSpellerBounce 0.6s ${i * 0.1}s infinite ease-in-out`,
+                }}
+              />
+            ))}
+          </div>
+          <p className="text-sm font-medium text-emerald-600">
+            Đang phân tích &quot;{input}&quot;...
+          </p>
+        </div>
+      )}
 
       {/* Result */}
-      <AnimatePresence>
-        {hasGenerated && steps.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="mt-6"
-          >
+      {hasGenerated && steps.length > 0 && (
+        <div className="mt-6">
             {/* Mini timeline dots */}
             <div className="mb-4 flex items-center justify-center gap-1 flex-wrap">
               {steps.map((step, i) => (
@@ -405,7 +333,11 @@ export default function NameSpeller() {
                             : "bg-emerald-100 text-emerald-700"
                   }`}
                 >
-                  {step.type === "space" ? "·" : step.label.charAt(0)}
+                  {step.type === "space" 
+                    ? "·" 
+                    : step.type === "tone" || step.type === "modifier"
+                      ? step.label.match(/\((.+?)\)/)?.[1] || step.label.charAt(0)
+                      : step.label.charAt(0)}
                 </button>
               ))}
             </div>
@@ -431,80 +363,69 @@ export default function NameSpeller() {
               </button>
 
               {/* Card content */}
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeIndex}
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -40 }}
-                  transition={{ duration: 0.25 }}
-                  className={`mx-auto max-w-sm rounded-2xl border-2 p-6 shadow-sm ${typeColors[currentStep.type]}`}
-                >
-                  {/* Step counter */}
-                  <div className="mb-3 flex items-center justify-between">
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${typeBadgeColors[currentStep.type]}`}
-                    >
-                      {currentStep.type === "letter" && "Chữ cái"}
-                      {currentStep.type === "modifier" && "Dấu phụ"}
-                      {currentStep.type === "tone" && "Dấu thanh"}
-                      {currentStep.type === "space" && "Ngắt từ"}
-                    </span>
-                    <span className="text-xs font-medium text-emerald-600/60">
-                      {activeIndex + 1} / {steps.length}
-                    </span>
-                  </div>
+              <div
+                key={activeIndex}
+                className={`mx-auto max-w-sm rounded-2xl border-2 p-6 shadow-sm transition-opacity duration-200 ${typeColors[currentStep.type]}`}
+              >
+                {/* Step counter */}
+                <div className="mb-3 flex items-center justify-between">
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${typeBadgeColors[currentStep.type]}`}
+                  >
+                    {currentStep.type === "letter" && "Chữ cái"}
+                    {currentStep.type === "modifier" && "Dấu phụ"}
+                    {currentStep.type === "tone" && "Dấu thanh"}
+                    {currentStep.type === "space" && "Ngắt từ"}
+                  </span>
+                  <span className="text-xs font-medium text-emerald-600/60">
+                    {activeIndex + 1} / {steps.length}
+                  </span>
+                </div>
 
-                  {/* Image or fallback */}
-                  <div className="mb-4 flex items-center justify-center">
-                    {currentStep.image ? (
-                      <img
-                        src={currentStep.image}
-                        alt={currentStep.label}
-                        className="h-48 w-48 rounded-xl object-contain"
-                      />
-                    ) : (
-                      <div className="flex h-48 w-48 items-center justify-center rounded-xl bg-white/60">
-                        <span className="text-5xl font-black text-emerald-400/60">
-                          {currentStep.type === "space"
-                            ? "⏸"
-                            : currentStep.label
-                                .match(/\((.+?)\)/)?.[1]
-                                ?.charAt(0) || currentStep.label.charAt(0)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                {/* Image or fallback */}
+                <div className="mb-4 flex items-center justify-center">
+                  {currentStep.image ? (
+                    <img
+                      src={currentStep.image}
+                      alt={currentStep.label}
+                      className="h-48 w-48 rounded-xl object-contain"
+                    />
+                  ) : (
+                    <div className="flex h-48 w-48 items-center justify-center rounded-xl bg-white/60">
+                      <span className="text-5xl font-black text-emerald-400/60">
+                        {currentStep.type === "space"
+                          ? "⏸"
+                          : currentStep.label
+                              .match(/\((.+?)\)/)?.[1]
+                              ?.charAt(0) || currentStep.label.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Label */}
-                  <h3 className="mb-1 text-center text-2xl font-black text-emerald-900">
-                    {currentStep.label}
-                  </h3>
-                  <p className="text-center text-xs text-emerald-700/60">
-                    {currentStep.hint}
-                  </p>
-                </motion.div>
-              </AnimatePresence>
+                {/* Label */}
+                <h3 className="mb-1 text-center text-2xl font-black text-emerald-900">
+                  {currentStep.label}
+                </h3>
+                <p className="text-center text-xs text-emerald-700/60">
+                  {currentStep.hint}
+                </p>
+              </div>
             </div>
 
             {/* Progress bar */}
             <div className="mt-4 h-1.5 rounded-full bg-emerald-100 overflow-hidden">
-              <motion.div
-                className="h-full rounded-full bg-emerald-500"
-                initial={false}
-                animate={{
-                  width: `${((activeIndex + 1) / steps.length) * 100}%`,
-                }}
-                transition={{ duration: 0.3 }}
+              <div
+                className="h-full rounded-full bg-emerald-500 transition-all duration-300"
+                style={{ width: `${((activeIndex + 1) / steps.length) * 100}%` }}
               />
             </div>
             <p className="mt-2 text-center text-[10px] text-emerald-500">
               Dùng phím ← → để chuyển bước · Nhấn vào dot phía trên để nhảy
               nhanh
             </p>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </div>
   );
 }

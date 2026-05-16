@@ -244,3 +244,16 @@
   - Ngắt từ (space) hiển thị card riêng với hướng dẫn
 - [x] `apps/web/src/app/alphabet/page.tsx`: Tích hợp NameSpeller vào Section 5
 - [x] Build passed ✓
+
+## 17. ✅ Alphabet: Master-Detail UX Refactor — DONE
+
+- [x] Cập nhật `alphabet.json` schema: thêm `Ă`, `Â`, `Ê`, `Ô`, `Ơ`, `Ư` thành entry độc lập.
+- [x] Thêm mapping quan hệ ngôn ngữ: `base_letter` và `related_letters`.
+- [x] Đập đi xây lại layout `page.tsx`:
+  - Từ điển Popup (Grid + Modal) -> Interactive Learning System (Master-Detail).
+  - Selector trái (Sticky top) và Learning Panel phải.
+  - Mobile Horizontal Scroll.
+- [x] Thêm UI "Chữ gốc" và "Biến thể" click để navigate tức thì.
+- [x] Hỗ trợ điều hướng bằng phím mũi tên.
+- [x] Đảm bảo NameSpeller hoạt động trơn tru với schema mới.
+- [x] Build passed ✓

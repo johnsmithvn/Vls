@@ -1,73 +1,173 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Hand, PenTool, X, ChevronLeft, ChevronRight, Hash, HelpCircle } from "lucide-react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+
+import { Hand, HelpCircle, ChevronLeft, ChevronRight, Play, Box, RefreshCw, X } from "lucide-react";
 import DATA from "@/data/alphabet.json";
 import NameSpeller from "@/components/features/alphabet/NameSpeller";
 
+type ItemType = "letter" | "diacritic" | "number";
 
-
-type LetterItem = (typeof DATA.letters)[number] & { video?: string };
-type NumberItem = (typeof DATA.numbers)[number];
-type DiacriticItem =
-  | (typeof DATA.diacritics.letter_modifiers)[number]
-  | (typeof DATA.diacritics.tone_marks)[number];
+interface SeqItem {
+  type: ItemType;
+  id: string;
+  section: string;
+}
 
 export default function AlphabetPage() {
-  const [selectedLetter, setSelectedLetter] = useState<LetterItem | null>(null);
-  const [mediaTab, setMediaTab] = useState<"video" | "image" | "3d">("image");
-  const [selectedDiacritic, setSelectedDiacritic] =
-    useState<DiacriticItem | null>(null);
-  const [selectedNumber, setSelectedNumber] = useState<NumberItem | null>(null);
+  const [activeType, setActiveType] = useState<ItemType>("letter");
+  const [activeId, setActiveId] = useState<string>("A");
+  const [imageIndex, setImageIndex] = useState(0);
 
-  // Prev/Next for letters
-  const currentLetterIndex = selectedLetter
-    ? DATA.letters.findIndex((l) => l.letter === selectedLetter.letter)
-    : -1;
-  const goToLetter = useCallback((dir: -1 | 1) => {
-    setSelectedLetter((prev) => {
-      if (!prev) return null;
-      const idx = DATA.letters.findIndex((l) => l.letter === prev.letter);
-      const next = idx + dir;
-      if (next < 0 || next >= DATA.letters.length) return prev;
-      setMediaTab("image");
-      return DATA.letters[next] as LetterItem;
-    });
-  }, []);
+  // Close modals
+  const [mediaModal, setMediaModal] = useState<"video" | "3d" | null>(null);
 
-  // Prev/Next for numbers
-  const currentNumberIndex = selectedNumber
-    ? DATA.numbers.findIndex((n) => n.number === selectedNumber.number)
-    : -1;
-  const goToNumber = useCallback((dir: -1 | 1) => {
-    setSelectedNumber((prev) => {
-      if (!prev) return null;
-      const idx = DATA.numbers.findIndex((n) => n.number === prev.number);
-      const next = idx + dir;
-      if (next < 0 || next >= DATA.numbers.length) return prev;
-      return DATA.numbers[next] as NumberItem;
-    });
-  }, []);
+  // Flatten sequence for Prev/Next
+  const sequence: SeqItem[] = useMemo(() => [
+    ...DATA.letters.filter(l => !l.is_extended).map(l => ({ type: "letter" as const, id: l.letter, section: "Chữ cái cơ bản" })),
+    ...DATA.letters.filter(l => l.is_extended).map(l => ({ type: "letter" as const, id: l.letter, section: "Chữ mở rộng" })),
+    ...DATA.diacritics.tone_marks.map(d => ({ type: "diacritic" as const, id: d.id, section: "Dấu thanh" })),
+    ...DATA.diacritics.letter_modifiers.map(d => ({ type: "diacritic" as const, id: d.id, section: "Dấu phụ" })),
+    ...DATA.numbers.map(n => ({ type: "number" as const, id: n.number, section: "Số tự nhiên" }))
+  ], []);
 
-  // Keyboard arrow navigation
+  const currentIndex = sequence.findIndex(s => s.type === activeType && s.id === activeId);
+  const currentSeq = sequence[currentIndex];
+
+  const goNext = useCallback(() => {
+    if (currentIndex < sequence.length - 1) {
+      const next = sequence[currentIndex + 1];
+      setActiveType(next.type);
+      setActiveId(next.id);
+      setImageIndex(0);
+    }
+  }, [currentIndex, sequence]);
+
+  const goPrev = useCallback(() => {
+    if (currentIndex > 0) {
+      const prev = sequence[currentIndex - 1];
+      setActiveType(prev.type);
+      setActiveId(prev.id);
+      setImageIndex(0);
+    }
+  }, [currentIndex, sequence]);
+
+  // Keyboard
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (selectedLetter) {
-        if (e.key === "ArrowLeft") goToLetter(-1);
-        if (e.key === "ArrowRight") goToLetter(1);
-        if (e.key === "Escape") setSelectedLetter(null);
-      }
-      if (selectedNumber) {
-        if (e.key === "ArrowLeft") goToNumber(-1);
-        if (e.key === "ArrowRight") goToNumber(1);
-        if (e.key === "Escape") setSelectedNumber(null);
-      }
-      if (selectedDiacritic && e.key === "Escape") setSelectedDiacritic(null);
+      // Don't trigger if user is typing in NameSpeller input
+      if (document.activeElement?.tagName === "INPUT") return;
+      
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "ArrowRight") goNext();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [selectedLetter, selectedNumber, selectedDiacritic, goToLetter, goToNumber]);
+  }, [goPrev, goNext]);
+
+  // Active Data normalization
+  const activeData = useMemo(() => {
+    if (activeType === "letter") {
+      const data = DATA.letters.find(l => l.letter === activeId);
+      return {
+        title: data?.letter || "",
+        subtitle: data?.is_extended ? "Ký hiệu mở rộng" : "Ký hiệu cơ bản",
+        images: data?.images || [],
+        mnemonic: data?.mnemonic,
+        derivation: data?.derivation,
+        base_letter: data?.base_letter,
+        related_letters: data?.related_letters,
+        // `video` and `model_3d` are optional fields not present in all JSON entries
+        video: (data as Record<string, unknown>)?.video as string | undefined,
+        model_3d: (data as Record<string, unknown>)?.model_3d as string | undefined
+      };
+    }
+    if (activeType === "diacritic") {
+      const allDiacritics = [...DATA.diacritics.tone_marks, ...DATA.diacritics.letter_modifiers];
+      const data = allDiacritics.find(d => d.id === activeId);
+      const isMod = DATA.diacritics.letter_modifiers.some(m => m.id === activeId);
+      return {
+        title: data?.name || "",
+        subtitle: isMod ? "Dấu phụ chữ cái" : "Dấu thanh điệu",
+        images: data?.images || [],
+        mnemonic: data?.gesture,
+        derivation: undefined,
+        base_letter: undefined,
+        related_letters: undefined,
+        video: undefined,
+        model_3d: undefined
+      };
+    }
+    if (activeType === "number") {
+      const data = DATA.numbers.find(n => n.number === activeId);
+      return {
+        title: data?.number || "",
+        subtitle: `Số ${data?.label}`,
+        images: data?.images || [],
+        mnemonic: data?.mnemonic,
+        derivation: undefined,
+        base_letter: undefined,
+        related_letters: undefined,
+        video: undefined,
+        model_3d: undefined
+      };
+    }
+    return null;
+  }, [activeType, activeId]);
+
+  const selectItem = (type: ItemType, id: string) => {
+    setActiveType(type);
+    setActiveId(id);
+    setImageIndex(0);
+    
+    // Auto scroll detail panel into view on mobile
+    if (window.innerWidth < 768) {
+      document.getElementById('learning-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // itemData shape varies between letters, diacritics, numbers — using Record for flexibility
+  const renderSelectorButton = (itemData: Record<string, unknown>, type: ItemType, id: string, label: string) => {
+    const isActive = activeType === type && activeId === id;
+    const images = itemData.images as string[] | undefined;
+    const hasImage = images && images.length > 0;
+    
+    return (
+      <>
+        {/* MOBILE: Compact Text Button */}
+        <button
+          onClick={() => selectItem(type, id)}
+          className={`md:hidden relative flex items-center justify-center rounded-xl border-2 transition-all min-w-[48px] h-[48px] shrink-0 font-black text-lg
+            ${isActive 
+              ? "border-primary bg-primary/10 shadow-md ring-2 ring-primary/20 text-primary" 
+              : "border-border bg-surface hover:border-primary/40 text-muted-foreground"}`}
+        >
+          {label}
+        </button>
+
+        {/* DESKTOP: Thumbnail Image Card */}
+        <button
+          onClick={() => selectItem(type, id)}
+          className={`hidden md:flex relative flex-col items-center justify-center overflow-hidden rounded-xl border-2 transition-all w-[64px] h-[82px] shrink-0
+            ${isActive 
+              ? "border-primary bg-primary/10 shadow-md ring-2 ring-primary/20 ring-offset-1" 
+              : "border-border bg-surface hover:border-primary/40 hover:bg-surface-hover hover:-translate-y-0.5"}`}
+        >
+          <div className="absolute inset-x-0 top-0 h-[72%] flex items-center justify-center p-1">
+             {hasImage ? (
+               <img src={images[0]} alt={label} className="h-full w-full object-contain scale-[1.3] mix-blend-multiply dark:mix-blend-normal" />
+             ) : (
+               <span className={`text-xl font-black opacity-30 ${isActive ? 'text-primary' : 'text-muted'}`}>{label.charAt(0)}</span>
+             )}
+          </div>
+          <div className={`absolute inset-x-0 bottom-0 h-[28%] flex items-center justify-center text-[13px] font-black tracking-wider
+            ${isActive ? 'bg-primary text-white' : 'bg-muted/10 text-foreground'}`}>
+            {label}
+          </div>
+        </button>
+      </>
+    );
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -82,209 +182,285 @@ export default function AlphabetPage() {
           </h1>
         </div>
         <p className="text-muted">
-          Nhấn vào thẻ để xem chi tiết cách ra ký hiệu. Học{" "}
-          {DATA.letters.length} chữ cái cơ bản + 9 dấu thanh & dấu phụ.
+          Hệ thống học tập tương tác. Chọn thẻ bên dưới để xem cách ra ký hiệu, hướng dẫn chi tiết và các biến thể.
         </p>
       </div>
 
-      {/* ═══════════════ SECTION 1: Base Letters ═══════════════ */}
-      <h2 className="mb-4 text-lg font-bold">
-        Chữ cái cơ bản ({DATA.letters.length} ký hiệu)
-      </h2>
-      <div className="grid grid-cols-4 gap-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8">
-        {DATA.letters.map((item, i) => (
-          <motion.button
-            key={item.letter}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: i * 0.02 }}
-            onClick={() => {
-              setSelectedLetter(item);
-              setMediaTab("image");
-            }}
-            className="group flex flex-col items-center justify-center rounded-2xl border border-border
-                       bg-surface p-4 shadow-sm transition-all
-                       hover:shadow-lg hover:-translate-y-1 hover:border-primary/40
-                       active:scale-95 cursor-pointer"
-          >
-            <span className="text-4xl font-bold text-primary sm:text-5xl group-hover:scale-110 transition-transform">
-              {item.letter}
-            </span>
-            <span className="mt-2 text-[10px] text-muted opacity-0 group-hover:opacity-100 transition-opacity">
-              Xem chi tiết
-            </span>
-          </motion.button>
-        ))}
-      </div>
-
-      {/* ═══════════════ SECTION 2: Letter Modifiers ═══════════════ */}
-      <div className="mt-12">
-        <div className="mb-4 flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10">
-            <PenTool className="h-4 w-4 text-violet-600" />
+      {/* MASTER-DETAIL LAYOUT */}
+      <div className="flex flex-col md:flex-row gap-8 mb-16">
+        
+        {/* LEFT COLUMN: SELECTOR */}
+        <div className="w-full md:w-[380px] shrink-0 flex flex-col gap-8">
+          {/* Section: Basic Letters */}
+          <div>
+            <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-muted flex items-center gap-2">
+              <span className="w-6 border-b border-border"></span>
+              Chữ cái cơ bản
+              <span className="w-6 border-b border-border"></span>
+            </h2>
+            {/* Mobile horizontal scroll, Desktop grid */}
+            <div className="flex flex-wrap justify-center md:justify-start gap-1.5 pb-2 md:pb-0">
+              {DATA.letters.filter(l => !l.is_extended).map(l => (
+                <div key={l.letter} className="snap-start">
+                  {renderSelectorButton(l, "letter", l.letter, l.letter)}
+                </div>
+              ))}
+            </div>
           </div>
-          <h2 className="text-lg font-bold">Dấu phụ chữ cái</h2>
+
+          {/* Section: Extended Letters */}
+          <div>
+            <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-violet-600 flex items-center gap-2">
+              <span className="w-6 border-b border-violet-200"></span>
+              Chữ mở rộng
+              <span className="w-6 border-b border-violet-200"></span>
+            </h2>
+            <div className="flex flex-wrap justify-center md:justify-start gap-1.5 pb-2 md:pb-0">
+              {DATA.letters.filter(l => l.is_extended).map(l => (
+                <div key={l.letter} className="snap-start">
+                  {renderSelectorButton(l, "letter", l.letter, l.letter)}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Section: Tone Marks */}
+          <div>
+            <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-rose-500 flex items-center gap-2">
+              <span className="w-6 border-b border-rose-200"></span>
+              Dấu thanh
+              <span className="w-6 border-b border-rose-200"></span>
+            </h2>
+            <div className="flex flex-wrap justify-center md:justify-start gap-1.5 pb-2 md:pb-0">
+              {DATA.diacritics.tone_marks.map(d => {
+                const shortLabel = d.name.match(/\((.+?)\)/)?.[1] || d.name.split(" ")[1] || d.name;
+                return (
+                  <div key={d.id} className="snap-start">
+                    {renderSelectorButton(d, "diacritic", d.id, shortLabel)}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section: Letter Modifiers */}
+          <div>
+            <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-orange-500 flex items-center gap-2">
+              <span className="w-6 border-b border-orange-200"></span>
+              Dấu phụ chữ cái
+              <span className="w-6 border-b border-orange-200"></span>
+            </h2>
+            <div className="flex flex-wrap justify-center md:justify-start gap-1.5 pb-2 md:pb-0">
+              {DATA.diacritics.letter_modifiers.map(d => {
+                const shortLabel = d.name.match(/\((.+?)\)/)?.[1] || d.name.split(" ")[1] || d.name;
+                return (
+                  <div key={d.id} className="snap-start">
+                    {renderSelectorButton(d, "diacritic", d.id, shortLabel)}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section: Numbers */}
+          <div>
+            <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-amber-600 flex items-center gap-2">
+              <span className="w-6 border-b border-amber-200"></span>
+              Số tự nhiên (0-10)
+              <span className="w-6 border-b border-amber-200"></span>
+            </h2>
+            <div className="flex flex-wrap justify-center md:justify-start gap-1.5 pb-2 md:pb-0">
+              {DATA.numbers.map(n => (
+                <div key={n.number} className="snap-start">
+                  {renderSelectorButton(n, "number", n.number, n.number)}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <p className="mb-4 text-sm text-muted">
-          Sau khi ra ký hiệu chữ cái gốc, thêm cử chỉ dấu phụ để tạo thành Ă,
-          Â, Đ, Ê, Ô, Ơ, Ư.
-        </p>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {DATA.diacritics.letter_modifiers.map((d) => (
-            <motion.button
-              key={d.id}
-              whileHover={{ y: -4 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setSelectedDiacritic(d)}
-              className="cursor-pointer rounded-2xl border border-border bg-surface p-4 shadow-sm
-                         text-left transition-all hover:shadow-lg hover:border-violet-300"
-            >
-              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-violet-50 mx-auto overflow-hidden">
-                {d.images.length > 0 ? (
-                  <img
-                    src={d.images[0]}
-                    alt={d.name}
-                    className="h-full w-full object-contain"
-                  />
-                ) : (
-                  <span className="text-2xl font-bold text-violet-500">
-                    {d.name.match(/\((.+?)\)/)?.[1] || d.name.charAt(0)}
-                  </span>
-                )}
+
+        {/* RIGHT COLUMN: LEARNING PANEL */}
+        <div id="learning-panel" className="w-full md:flex-1 md:sticky md:top-24 self-start scroll-mt-24">
+          <div className="rounded-2xl border border-border bg-surface shadow-xl overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
+            
+            {/* Panel Header: Progress & Nav */}
+            <div className="flex items-center justify-between border-b border-border bg-muted/5 px-4 py-3">
+                            <button 
+                onClick={goPrev} 
+                disabled={currentIndex === 0}
+                className="p-2 rounded-full hover:bg-surface-hover disabled:opacity-30 transition shrink-0"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              
+              <div className="text-sm font-bold text-muted-foreground text-center px-2 truncate">
+                <span className="text-primary">{currentIndex + 1}</span> / {sequence.length}
+                <span className="hidden sm:inline"> — {currentSeq?.section}</span>
               </div>
-              <h3 className="text-center text-sm font-bold text-violet-700">
-                {d.name}
-              </h3>
-              <p className="mt-1 text-center text-xs text-muted">
-                {"applies_to" in d ? d.applies_to.join(", ") : ""}
-              </p>
-            </motion.button>
-          ))}
-        </div>
-      </div>
 
-      {/* ═══════════════ SECTION 3: Tone Marks ═══════════════ */}
-      <div className="mt-10">
-        <div className="mb-4 flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/10">
-            <PenTool className="h-4 w-4 text-rose-500" />
-          </div>
-          <h2 className="text-lg font-bold">Dấu thanh</h2>
-        </div>
-        <p className="mb-4 text-sm text-muted">
-          5 dấu thanh điệu. Sau khi đánh vần xong từ, dùng cử chỉ tay để biểu
-          thị thanh điệu. Thanh ngang không cần thêm cử chỉ.
-        </p>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-          {DATA.diacritics.tone_marks.map((t) => (
-            <motion.button
-              key={t.id}
-              whileHover={{ y: -4 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setSelectedDiacritic(t)}
-              className="cursor-pointer rounded-2xl border border-border bg-surface p-4 shadow-sm
-                         text-left transition-all hover:shadow-lg hover:border-rose-300"
-            >
-              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-rose-50 mx-auto overflow-hidden">
-                {t.images.length > 0 ? (
-                  <img
-                    src={t.images[0]}
-                    alt={t.name}
-                    className="h-full w-full object-contain"
-                  />
-                ) : (
-                  <span className="text-2xl font-bold text-rose-400">
-                    {t.name.match(/\((.+?)\)/)?.[1] || t.name.charAt(0)}
-                  </span>
+              <div className="flex items-center gap-2 shrink-0">
+                {activeData?.images && activeData.images.length > 1 && (
+                  <button 
+                    onClick={() => setImageIndex(i => (i + 1) % activeData.images.length)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold hover:bg-primary/20 transition"
+                    title="Đổi góc nhìn"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Góc khác</span>
+                  </button>
                 )}
+                <button 
+                  onClick={goNext} 
+                  disabled={currentIndex === sequence.length - 1}
+                  className="p-2 rounded-full hover:bg-surface-hover disabled:opacity-30 transition"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
               </div>
-              <h3 className="text-center text-sm font-bold text-rose-600">
-                {t.name}
-              </h3>
-              <p className="mt-1 text-center text-xs text-muted">
-                {"example" in t ? t.example : ""}
-              </p>
-            </motion.button>
-          ))}
-        </div>
-      </div>
+            </div>
 
-      {/* ═══════════════ SECTION 4: Numbers ═══════════════ */}
-      <div className="mt-12">
-        <div className="mb-4 flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10">
-            <Hash className="h-4 w-4 text-amber-600" />
+            {/* Panel Body */}
+            {activeData && (
+              <div key={`${activeType}-${activeId}`} className="p-6 md:p-8">
+                  <div className="flex flex-col md:flex-row gap-8">
+                    
+                    {/* Left side of Panel: Main Image */}
+                    <div className="w-full md:w-1/2 flex flex-col gap-4">
+                      <div className="relative aspect-square w-full rounded-2xl border border-border bg-muted/10 overflow-hidden flex items-center justify-center group">
+                        {activeData.images && activeData.images.length > 0 ? (
+                            <img
+                              key={activeData.images[imageIndex]}
+                              src={activeData.images[imageIndex]}
+                              alt={activeData.title}
+                              className="w-full h-full object-contain transition-opacity duration-200"
+                            />
+                        ) : (
+                          <span className="text-8xl font-black text-muted/20">
+                            {activeData.title.match(/\((.+?)\)/)?.[1] || activeData.title.charAt(0)}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Media Action Buttons */}
+                      <div className="flex gap-2">
+                        {activeData.video && (
+                          <button 
+                            onClick={() => setMediaModal("video")}
+                            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
+                          >
+                            <Play className="h-4 w-4" />
+                            Xem Video
+                          </button>
+                        )}
+                        {activeData.model_3d && (
+                          <button 
+                            onClick={() => setMediaModal("3d")}
+                            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/20"
+                          >
+                            <Box className="h-4 w-4" />
+                            Mô hình 3D
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right side of Panel: Info */}
+                    <div className="w-full md:w-1/2 flex flex-col">
+                      <div className="mb-6">
+                        <h2 className="text-5xl font-black text-foreground mb-2">{activeData.title}</h2>
+                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest">{activeData.subtitle}</p>
+                      </div>
+
+                      {/* Relationships / Derivation */}
+                      {(activeData.derivation || activeData.base_letter || activeData.related_letters) && (
+                        <div className="mb-6 rounded-xl border border-violet-200 bg-violet-50 p-4 dark:bg-violet-950/20 dark:border-violet-900/50">
+                          <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-violet-600">Mối quan hệ</h3>
+                          
+                          {activeData.derivation && (
+                            <p className="text-sm text-violet-800 dark:text-violet-200 mb-3 leading-relaxed">
+                              {activeData.derivation}
+                            </p>
+                          )}
+
+                          <div className="flex flex-wrap gap-2">
+                            {activeData.base_letter && (
+                              <button 
+                                onClick={() => selectItem("letter", activeData.base_letter!)}
+                                className="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-violet-700 shadow-sm border border-violet-100 hover:border-violet-300 transition"
+                              >
+                                ← Chữ gốc: {activeData.base_letter}
+                              </button>
+                            )}
+                            {activeData.related_letters?.map(rel => (
+                              <button 
+                                key={rel}
+                                onClick={() => selectItem("letter", rel)}
+                                className="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-violet-700 shadow-sm border border-violet-100 hover:border-violet-300 transition"
+                              >
+                                Biến thể: {rel} →
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Mnemonic */}
+                      {activeData.mnemonic && (
+                        <div>
+                          <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">Cách ra ký hiệu</h3>
+                          <div className="rounded-xl bg-muted/10 p-4 border border-border">
+                            <p className="text-base font-medium leading-relaxed">
+                              {activeData.mnemonic}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+            )}
           </div>
-          <h2 className="text-lg font-bold">Số tự nhiên (0–10)</h2>
-        </div>
-        <p className="mb-4 text-sm text-muted">
-          Cách biểu thị số bằng tay. Nhấn vào thẻ để xem chi tiết.
-        </p>
-        <div className="grid grid-cols-4 gap-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-11">
-          {DATA.numbers.map((item, i) => (
-            <motion.button
-              key={item.number}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.03 }}
-              onClick={() => setSelectedNumber(item)}
-              className="group flex flex-col items-center justify-center rounded-2xl border border-border
-                         bg-surface p-4 shadow-sm transition-all
-                         hover:shadow-lg hover:-translate-y-1 hover:border-amber-400
-                         active:scale-95 cursor-pointer"
-            >
-              <span className="text-3xl font-bold text-amber-600 sm:text-4xl group-hover:scale-110 transition-transform">
-                {item.number}
-              </span>
-              <span className="mt-1 text-[10px] text-muted">
-                {item.label}
-              </span>
-            </motion.button>
-          ))}
+          
+          <div className="mt-4 text-center">
+            <p className="text-xs text-muted-foreground">
+              💡 Mẹo: Dùng phím <kbd className="rounded border bg-muted px-1">←</kbd> <kbd className="rounded border bg-muted px-1">→</kbd> trên bàn phím để chuyển chữ nhanh.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Hint */}
-      <p className="mt-8 mb-12 text-center text-xs text-muted">
-        Nhấn vào bất kỳ thẻ nào để xem chi tiết · Dùng phím ← → để chuyển
-      </p>
-
-      {/* ═══════════════ SECTION 5: Name Spelling ═══════════════ */}
+      {/* ═══════════════ SECTION: Name Spelling ═══════════════ */}
       <div className="mb-10">
         <NameSpeller />
       </div>
 
-      {/* ═══════════════ SECTION 6: Information ═══════════════ */}
-      <div className="mb-8 overflow-hidden rounded-2xl bg-sky-50 p-6 text-sky-900 shadow-sm border border-sky-100">
+      {/* ═══════════════ SECTION: Information ═══════════════ */}
+      <div className="mb-8 overflow-hidden rounded-2xl bg-sky-50 p-6 text-sky-900 shadow-sm border border-sky-100 dark:bg-sky-950/20 dark:text-sky-100 dark:border-sky-900/50">
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-500 text-white shadow-sm">
             <HelpCircle className="h-5 w-5" />
           </div>
-          <h2 className="text-xl font-bold text-sky-700">
+          <h2 className="text-xl font-bold text-sky-700 dark:text-sky-300">
             Bảng chữ cái ngón tay là gì?
           </h2>
         </div>
         
-        <div className="space-y-4 text-sm leading-relaxed text-sky-800/90">
+        <div className="space-y-4 text-sm leading-relaxed text-sky-800/90 dark:text-sky-200/90">
           <p>
             Bảng chữ cái ngón tay là một trong những nội dung căn bản và đầu tiên của việc học Ngôn Ngữ Ký Hiệu. Giống như việc học đánh vần trong Tiếng Việt vậy. Về cơ bản thì đánh vần chữ cái ngón tay được sử dụng khi:
           </p>
-          
           <ul className="ml-6 list-disc space-y-1 font-medium">
             <li>Cần thông báo tên riêng (địa danh, người...)</li>
             <li>Khi cần biểu đạt khái niệm mà bạn không biết ký hiệu</li>
           </ul>
-
           <p>
             Khi đánh vần, bạn phải đánh vần chữ cái trước và các thanh (sắc, huyền, hỏi, ngã, nặng) bỏ sau cùng.
           </p>
-
-          <p className="rounded-lg bg-sky-100/50 p-3 italic">
+          <p className="rounded-lg bg-sky-100/50 p-3 italic dark:bg-sky-900/50">
             Ví dụ: &quot;Hà Nội&quot; sẽ được đánh vần theo thứ tự sau: <strong>H | A | Dấu Huyền | (ngắt chữ) | N | Ô | I | Dấu nặng</strong>
           </p>
-
           <div className="pt-2">
-            <p className="font-semibold text-sky-900 mb-2">Khoảng cách giữa 2 từ sẽ được thể hiện bằng những cách sau:</p>
+            <p className="font-semibold text-sky-900 dark:text-sky-100 mb-2">Khoảng cách giữa 2 từ sẽ được thể hiện bằng những cách sau:</p>
             <ul className="ml-6 list-disc space-y-1.5">
               <li>Gật đầu sau mỗi từ.</li>
               <li>Ngưng lại 1 khoảng thời gian từ 0,5 - 1 giây giữa 2 từ.</li>
@@ -295,313 +471,43 @@ export default function AlphabetPage() {
         </div>
       </div>
 
-      {/* ═══════════════ Letter Detail Modal ═══════════════ */}
-      <AnimatePresence>
-        {selectedLetter && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedLetter(null)}
+      {/* ═══════════════ Media Modal (Video/3D only) ═══════════════ */}
+      {mediaModal && activeData && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 transition-opacity duration-200"
+          onClick={() => setMediaModal(null)}
+        >
+          <div
+            className="relative w-full max-w-4xl aspect-video rounded-2xl border border-border bg-black shadow-2xl overflow-hidden flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              className="relative w-full max-w-md rounded-2xl border border-border bg-surface p-8 shadow-2xl"
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
+            <button
+              onClick={() => setMediaModal(null)}
+              className="absolute right-4 top-4 z-10 rounded-full bg-black/50 p-2 text-white backdrop-blur-md transition hover:bg-white/20"
             >
-              <button
-                onClick={() => setSelectedLetter(null)}
-                className="absolute right-4 top-4 rounded-lg p-1.5 text-muted hover:bg-surface-hover transition-colors z-10"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              <X className="h-5 w-5" />
+            </button>
 
-              {/* Prev/Next arrows */}
-              {currentLetterIndex > 0 && (
-                <button
-                  onClick={() => goToLetter(-1)}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-surface border border-border p-2 shadow-md text-muted hover:text-foreground hover:bg-surface-hover transition-colors z-10"
-                  title="Chữ trước (←)"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-              )}
-              {currentLetterIndex < DATA.letters.length - 1 && (
-                <button
-                  onClick={() => goToLetter(1)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-surface border border-border p-2 shadow-md text-muted hover:text-foreground hover:bg-surface-hover transition-colors z-10"
-                  title="Chữ sau (→)"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              )}
-
-              <div className="text-center">
-                {/* Letter badge */}
-                <div className="mb-5 inline-flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 ring-2 ring-primary/10">
-                  <span className="text-6xl font-extrabold text-primary">
-                    {selectedLetter.letter}
-                  </span>
-                </div>
-
-                <h2 className="mb-1 text-2xl font-bold">
-                  Chữ {selectedLetter.letter}
-                </h2>
-                <p className="text-muted mb-5">{selectedLetter.mnemonic}</p>
-
-                {/* Media preview: Tabs */}
-                <div className="rounded-xl border border-border bg-surface-hover p-2">
-                  <div className="mb-3 flex rounded-lg bg-surface p-1 shadow-sm">
-                    <button
-                      onClick={() => setMediaTab("image")}
-                      className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                        mediaTab === "image"
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "text-muted hover:text-foreground"
-                      }`}
-                    >
-                      Hình ảnh
-                    </button>
-                    {selectedLetter.video && (
-                      <button
-                        onClick={() => setMediaTab("video")}
-                        className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                          mediaTab === "video"
-                            ? "bg-primary text-primary-foreground shadow-sm"
-                            : "text-muted hover:text-foreground"
-                        }`}
-                      >
-                        Video
-                      </button>
-                    )}
-                  </div>
-
-                  {mediaTab === "video" && selectedLetter.video && (
-                    <div className="overflow-hidden rounded-lg aspect-video bg-black/5">
-                      <iframe
-                        src={selectedLetter.video.replace(/\/view.*$/, "/preview")}
-                        className="h-full w-full"
-                        allow="autoplay; encrypted-media"
-                        allowFullScreen
-                        loading="lazy"
-                        title={`Video ký hiệu chữ ${selectedLetter.letter}`}
-                        style={{ border: "none" }}
-                      />
-                    </div>
-                  )}
-
-                  {mediaTab === "image" && (
-                    <div className="space-y-2">
-                      {selectedLetter.images && selectedLetter.images.length > 1 ? (
-                        <div className="grid grid-cols-2 gap-2">
-                          {selectedLetter.images.map((img, idx) => (
-                            <div key={idx} className="flex h-28 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
-                              <img
-                                src={img.replace(/\/view.*$/, "/preview")}
-                                alt={`Góc độ ${idx + 1}`}
-                                className="h-full w-full object-cover"
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="flex h-48 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
-                          <img
-                            src={selectedLetter.images[0]}
-                            alt={`Ký hiệu chữ ${selectedLetter.letter}`}
-                            className="h-full w-full object-contain"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                </div>
-
-                {/* How-to */}
-                <div className="mt-5 rounded-xl border border-primary/10 bg-primary/5 p-4 text-left">
-                  <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-1">
-                    Cách ra ký hiệu
-                  </p>
-                  <p className="text-sm text-foreground">
-                    {selectedLetter.mnemonic}
-                  </p>
-                </div>
-
-                {/* Counter */}
-                <p className="mt-4 text-[10px] text-muted">
-                  {currentLetterIndex + 1} / {DATA.letters.length} · Dùng phím ← → để chuyển
-                </p>
+            {mediaModal === "video" && activeData.video && (
+              <iframe
+                src={activeData.video}
+                className="h-full w-full"
+                allow="autoplay"
+                allowFullScreen
+              />
+            )}
+            
+            {mediaModal === "3d" && activeData.model_3d && (
+              <div className="text-white text-center">
+                <Box className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Trình duyệt 3D đang tải...</p>
+                <p className="text-xs text-muted-foreground mt-2">Tính năng đang được phát triển (Phase 5)</p>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            )}
+          </div>
+        </div>
+      )}
 
-      {/* ═══════════════ Diacritic Detail Modal ═══════════════ */}
-      <AnimatePresence>
-        {selectedDiacritic && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedDiacritic(null)}
-          >
-            <motion.div
-              className="relative w-full max-w-md rounded-2xl border border-border bg-surface p-8 shadow-2xl"
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setSelectedDiacritic(null)}
-                className="absolute right-4 top-4 rounded-lg p-1.5 text-muted hover:bg-surface-hover transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-
-              <div className="text-center">
-                {/* Icon */}
-                <div className="mb-5 flex h-28 w-28 mx-auto items-center justify-center rounded-2xl bg-violet-50 overflow-hidden ring-2 ring-violet-100">
-                  {selectedDiacritic.images.length > 0 ? (
-                    <img
-                      src={selectedDiacritic.images[0]}
-                      alt={selectedDiacritic.name}
-                      className="h-full w-full object-contain"
-                    />
-                  ) : (
-                    <span className="text-5xl font-bold text-violet-400">
-                      {selectedDiacritic.name.match(/\((.+?)\)/)?.[1] || selectedDiacritic.name.charAt(0)}
-                    </span>
-                  )}
-                </div>
-
-                <h2 className="mb-3 text-2xl font-bold">
-                  {selectedDiacritic.name}
-                </h2>
-
-                {"applies_to" in selectedDiacritic && (
-                  <div className="mb-4 flex flex-wrap justify-center gap-1.5">
-                    {selectedDiacritic.applies_to.map((a: string) => (
-                      <span
-                        key={a}
-                        className="rounded-full bg-violet-100 px-3 py-1 text-xs font-medium text-violet-700"
-                      >
-                        {a}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {"example" in selectedDiacritic && (
-                  <p className="mb-4 text-sm text-muted">
-                    Ví dụ: {selectedDiacritic.example}
-                  </p>
-                )}
-
-                {/* How-to */}
-                <div className="mt-4 rounded-xl border border-violet-100 bg-violet-50/50 p-4 text-left">
-                  <p className="text-xs font-semibold text-violet-600 uppercase tracking-wider mb-1">
-                    Cách ra ký hiệu
-                  </p>
-                  <p className="text-sm text-foreground">
-                    {selectedDiacritic.gesture}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ═══════════════ Number Detail Modal ═══════════════ */}
-      <AnimatePresence>
-        {selectedNumber && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedNumber(null)}
-          >
-            <motion.div
-              className="relative w-full max-w-md rounded-2xl border border-border bg-surface p-8 shadow-2xl"
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setSelectedNumber(null)}
-                className="absolute right-4 top-4 rounded-lg p-1.5 text-muted hover:bg-surface-hover transition-colors z-10"
-              >
-                <X className="h-5 w-5" />
-              </button>
-
-              {currentNumberIndex > 0 && (
-                <button
-                  onClick={() => goToNumber(-1)}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-surface border border-border p-2 shadow-md text-muted hover:text-foreground hover:bg-surface-hover transition-colors z-10"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-              )}
-              {currentNumberIndex < DATA.numbers.length - 1 && (
-                <button
-                  onClick={() => goToNumber(1)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-surface border border-border p-2 shadow-md text-muted hover:text-foreground hover:bg-surface-hover transition-colors z-10"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              )}
-
-              <div className="text-center">
-                <div className="mb-5 inline-flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 ring-2 ring-amber-500/10">
-                  <span className="text-6xl font-extrabold text-amber-600">
-                    {selectedNumber.number}
-                  </span>
-                </div>
-
-                <h2 className="mb-1 text-2xl font-bold">
-                  Số {selectedNumber.number} — {selectedNumber.label}
-                </h2>
-                <p className="text-muted mb-5">{selectedNumber.mnemonic}</p>
-
-                <div className="rounded-xl border border-border bg-surface-hover p-2">
-                  <div className="flex h-48 items-center justify-center rounded-lg bg-white/60 overflow-hidden">
-                    <img
-                      src={selectedNumber.images[0]}
-                      alt={`Ký hiệu số ${selectedNumber.number}`}
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-5 rounded-xl border border-amber-100 bg-amber-50/50 p-4 text-left">
-                  <p className="text-xs font-semibold text-amber-600 uppercase tracking-wider mb-1">
-                    Cách ra ký hiệu
-                  </p>
-                  <p className="text-sm text-foreground">
-                    {selectedNumber.mnemonic}
-                  </p>
-                </div>
-
-                <p className="mt-4 text-[10px] text-muted">
-                  {currentNumberIndex + 1} / {DATA.numbers.length} · Dùng phím ← → để chuyển
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

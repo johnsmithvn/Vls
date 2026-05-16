@@ -6,6 +6,24 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## v1.4.0 — 2026-05-16
+
+### Added
+- **Alphabet: Master-Detail UX**: Thiết kế lại toàn bộ luồng học Bảng chữ cái thành mô hình "Interactive Learning System" (giống Duolingo). 
+  - Thêm hệ thống "Selector" cuộn ngang (mobile) hoặc dọc (desktop).
+  - Thêm "Learning Panel" cố định (Sticky) giúp người dùng học liên tục không bị gián đoạn bởi pop-up Modal.
+  - Phân vùng chữ cái rõ ràng: Chữ cơ bản, Mở rộng, Dấu Tiếng Việt, Số đếm.
+- **Linguistic Data Architecture**: Cấu trúc lại `alphabet.json` để phản ánh đúng quan hệ ngôn ngữ học.
+  - Thêm các chữ `Ă, Â, Ê, Ô, Ơ, Ư` thành đối tượng (card) độc lập.
+  - Hỗ trợ mảng "Chữ gốc" (`base_letter`) và "Biến thể" (`related_letters`).
+  - Hỗ trợ bấm nút để chuyển qua lại tức thì giữa chữ gốc và biến thể.
+
+### Changed
+- Modal giờ chỉ dùng làm "Advanced Media Viewer" (Xem Video/3D phóng to).
+- Khắc phục các lỗi Typing `any` trong `page.tsx` tuân thủ strict mode của `RULES.md`.
+
+---
+
 ## v1.3.0 — 2026-05-16
 
 ### Added

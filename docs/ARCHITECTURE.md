@@ -118,18 +118,20 @@ apps/api/
 │   │   └── session.py
 │   │
 │   ├── modules/                 # Domain Driven
-│   │   ├── auth/
+│   │   ├── admin/               # Admin CMS — CRUD words, categories, dashboard (owner only)
+│   │   ├── auth/                # User model (role: owner/contributor/user), JWT
 │   │   ├── dictionary/          # models: Word, CanonicalSign, SignAsset, Category, WordCategory
 │   │   ├── translation/         # (LOCKED — Coming Soon)
 │   │   ├── notebook/
 │   │   └── media/
 │   │
-│   └── main.py                  # v1.0.0
+│   └── main.py                  # v1.2.0
 │
 ├── alembic/
 │   └── versions/
 │       ├── 001_init_core_schema.py
-│       └── 002_add_entry_type_categories_review.py
+│       ├── 002_add_entry_type_categories_review.py
+│       └── 003_add_user_role.py
 ├── pyproject.toml               # Poetry
 └── alembic.ini
 ```
@@ -149,6 +151,10 @@ apps/worker/
 apps/web/src/
 ├── app/                        # Next.js App Router (pages)
 │   ├── page.tsx               # Home (Hero + Feature Cards)
+│   ├── admin/                 # Admin CMS (owner only)
+│   │   ├── layout.tsx         # Auth guard + admin nav
+│   │   ├── page.tsx           # Dashboard stats
+│   │   └── words/             # Word CRUD (list, new, edit)
 │   ├── alphabet/page.tsx      # Bảng chữ cái (static JSON)
 │   ├── dictionary/
 │   │   ├── page.tsx           # Dictionary Landing (Browse + Search)
@@ -162,12 +168,12 @@ apps/web/src/
 │   │   ├── translation/        # SignTimelinePlayer (deactivated)
 │   │   └── notebook/
 │   ├── shared/                 # Dùng chung
-│   │   ├── ui/                 # Button, Input, Skeleton, Modal
+│   │   ├── ui/                 # Button, Input, Skeleton, Modal, SignMediaPlayer
 │   │   └── layout/             # Header (4 nav items)
 │   └── entities/               # MediaRenderer
 ├── data/
 │   └── alphabet.json           # Static alphabet data (B7 rule)
-├── lib/                        # API client, utilities
+├── lib/                        # API client, admin-api, supabase client
 └── stores/                     # Zustand stores
 ```
 
@@ -321,7 +327,8 @@ Mọi dữ liệu liên quan đến user đều phải gắn `user_id` ngay từ
 ### 9.3. Authorization Rules
 - **Public routes:** Dictionary search, Word detail (không cần login).
 - **Protected routes:** Bookmark CRUD, User profile, Learning data (cần JWT).
-- **Admin routes:** Media upload, Word CRUD, Content moderation (cần role `admin`).
+- **Admin routes:** Word CRUD, Category CRUD, Dashboard stats (cần role `owner`).
+- **RBAC Roles:** `owner` (full admin) → `contributor` (submit for review, future) → `user` (public features).
 
 ---
 

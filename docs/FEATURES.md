@@ -26,6 +26,7 @@
 - **Data:** Static JSON (`src/data/alphabet.json`). Không gọi API.
 - **3D tab:** Chỉ hiện khi `model_3d` có giá trị (conditional rendering).
 - **UX:** Click chữ cái → Modal hiển thị hình ảnh bàn tay + video hướng dẫn.
+- **Hướng dẫn học:** Section "Bảng chữ cái ngón tay là gì?" ở cuối trang, giải thích luật đánh vần và khoảng cách từ.
 
 ### 2.2. Từ Điển — "Siêu Từ Điển" ✅ v1.0.0
 Hỗ trợ 3 loại entry: **Từ đơn** (`word`), **Cụm từ** (`phrase`), **Câu thông dụng** (`sentence`).
@@ -119,7 +120,7 @@ Tự quyết định render dựa trên `asset.media_type`:
 
 ---
 
-## 5. NAVIGATION STRUCTURE (v1.0.0)
+## 5. NAVIGATION STRUCTURE (v1.2.0)
 
 | Nav Item | Path | Status |
 |---|---|---|
@@ -127,3 +128,34 @@ Tự quyết định render dựa trên `asset.media_type`:
 | Từ điển | `/dictionary` | ✅ Active |
 | Chữ cái | `/alphabet` | ✅ Active |
 | Dịch câu | `/translate` | 🚧 Coming Soon (badge) |
+| Admin | `/admin` | ✅ Active (owner only) |
+
+---
+
+## 6. ADMIN CMS (v1.2.0) ✅
+
+### 6.1. Phân quyền (RBAC)
+- **Role `owner`:** Truy cập đầy đủ Admin (CRUD words, categories, dashboard).
+- **Role `contributor`:** (Tương lai) Tạo từ mới, gửi duyệt (Maker-Checker).
+- **Role `user`:** Người dùng thường, không truy cập Admin.
+- **Auth:** Supabase Auth (Email/Password). Login form tại `/admin`.
+
+### 6.2. Dashboard (`/admin`)
+- Card thống kê: Tổng từ đơn, cụm từ, câu, chủ đề, video, hình ảnh.
+
+### 6.3. Quản lý Từ vựng (`/admin/words`)
+- Bảng danh sách: tên, loại, từ loại, video status, chủ đề.
+- Search + Pagination.
+- Thao tác: Sửa, Xóa (confirm dialog).
+
+### 6.4. Form Tạo/Sửa Từ (`/admin/words/new`, `/admin/words/[id]/edit`)
+- **Thông tin cơ bản:** Tên từ, loại (word/phrase/sentence), từ loại, độ khó, mô tả, tags.
+- **Chủ đề:** Multi-select toggle buttons.
+- **Biến thể vùng miền:** Thêm nhiều canonical_signs, mỗi sign có:
+  - Tên biến thể, Vùng miền (Chuẩn/Bắc/Trung/Nam), checkbox Mặc định.
+  - **Link Video:** Dán link Google Drive hoặc YouTube. Preview trực tiếp bằng `SignMediaPlayer`.
+
+### 6.5. SignMediaPlayer (Shared Component)
+- Auto-detect URL type: Google Drive → iframe `/preview`, YouTube → iframe `/embed`, Direct → `<video>`.
+- Fallback UI khi URL rỗng hoặc không hợp lệ.
+- Dùng chung ở cả Admin form (preview) và Dictionary detail (hiển thị).

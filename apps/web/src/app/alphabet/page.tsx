@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Hand, PenTool, X, ChevronLeft, ChevronRight, Hash } from "lucide-react";
+import { Hand, PenTool, X, ChevronLeft, ChevronRight, Hash, HelpCircle } from "lucide-react";
 import DATA from "@/data/alphabet.json";
+import NameSpeller from "@/components/features/alphabet/NameSpeller";
 
 
 
@@ -139,11 +140,17 @@ export default function AlphabetPage() {
                          text-left transition-all hover:shadow-lg hover:border-violet-300"
             >
               <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-violet-50 mx-auto overflow-hidden">
-                <img
-                  src={d.images[0]}
-                  alt={d.name}
-                  className="h-full w-full object-contain"
-                />
+                {d.images.length > 0 ? (
+                  <img
+                    src={d.images[0]}
+                    alt={d.name}
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <span className="text-2xl font-bold text-violet-500">
+                    {d.name.match(/\((.+?)\)/)?.[1] || d.name.charAt(0)}
+                  </span>
+                )}
               </div>
               <h3 className="text-center text-sm font-bold text-violet-700">
                 {d.name}
@@ -179,11 +186,17 @@ export default function AlphabetPage() {
                          text-left transition-all hover:shadow-lg hover:border-rose-300"
             >
               <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-rose-50 mx-auto overflow-hidden">
-                <img
-                  src={t.images[0]}
-                  alt={t.name}
-                  className="h-full w-full object-contain"
-                />
+                {t.images.length > 0 ? (
+                  <img
+                    src={t.images[0]}
+                    alt={t.name}
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <span className="text-2xl font-bold text-rose-400">
+                    {t.name.match(/\((.+?)\)/)?.[1] || t.name.charAt(0)}
+                  </span>
+                )}
               </div>
               <h3 className="text-center text-sm font-bold text-rose-600">
                 {t.name}
@@ -232,9 +245,55 @@ export default function AlphabetPage() {
       </div>
 
       {/* Hint */}
-      <p className="mt-8 text-center text-xs text-muted">
+      <p className="mt-8 mb-12 text-center text-xs text-muted">
         Nhấn vào bất kỳ thẻ nào để xem chi tiết · Dùng phím ← → để chuyển
       </p>
+
+      {/* ═══════════════ SECTION 5: Name Spelling ═══════════════ */}
+      <div className="mb-10">
+        <NameSpeller />
+      </div>
+
+      {/* ═══════════════ SECTION 6: Information ═══════════════ */}
+      <div className="mb-8 overflow-hidden rounded-2xl bg-sky-50 p-6 text-sky-900 shadow-sm border border-sky-100">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-500 text-white shadow-sm">
+            <HelpCircle className="h-5 w-5" />
+          </div>
+          <h2 className="text-xl font-bold text-sky-700">
+            Bảng chữ cái ngón tay là gì?
+          </h2>
+        </div>
+        
+        <div className="space-y-4 text-sm leading-relaxed text-sky-800/90">
+          <p>
+            Bảng chữ cái ngón tay là một trong những nội dung căn bản và đầu tiên của việc học Ngôn Ngữ Ký Hiệu. Giống như việc học đánh vần trong Tiếng Việt vậy. Về cơ bản thì đánh vần chữ cái ngón tay được sử dụng khi:
+          </p>
+          
+          <ul className="ml-6 list-disc space-y-1 font-medium">
+            <li>Cần thông báo tên riêng (địa danh, người...)</li>
+            <li>Khi cần biểu đạt khái niệm mà bạn không biết ký hiệu</li>
+          </ul>
+
+          <p>
+            Khi đánh vần, bạn phải đánh vần chữ cái trước và các thanh (sắc, huyền, hỏi, ngã, nặng) bỏ sau cùng.
+          </p>
+
+          <p className="rounded-lg bg-sky-100/50 p-3 italic">
+            Ví dụ: &quot;Hà Nội&quot; sẽ được đánh vần theo thứ tự sau: <strong>H | A | Dấu Huyền | (ngắt chữ) | N | Ô | I | Dấu nặng</strong>
+          </p>
+
+          <div className="pt-2">
+            <p className="font-semibold text-sky-900 mb-2">Khoảng cách giữa 2 từ sẽ được thể hiện bằng những cách sau:</p>
+            <ul className="ml-6 list-disc space-y-1.5">
+              <li>Gật đầu sau mỗi từ.</li>
+              <li>Ngưng lại 1 khoảng thời gian từ 0,5 - 1 giây giữa 2 từ.</li>
+              <li>Dùng bàn tay gạt từ phải sang trái nếu thuận tay phải và ngược lại nếu thuận tay trái.</li>
+              <li>Đánh vần các từ từ trái sang phải, sau mỗi từ thì tay đánh vần chuyển động sang phải (giống cách viết chữ).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       {/* ═══════════════ Letter Detail Modal ═══════════════ */}
       <AnimatePresence>
@@ -411,11 +470,17 @@ export default function AlphabetPage() {
               <div className="text-center">
                 {/* Icon */}
                 <div className="mb-5 flex h-28 w-28 mx-auto items-center justify-center rounded-2xl bg-violet-50 overflow-hidden ring-2 ring-violet-100">
-                  <img
-                    src={selectedDiacritic.images[0]}
-                    alt={selectedDiacritic.name}
-                    className="h-full w-full object-contain"
-                  />
+                  {selectedDiacritic.images.length > 0 ? (
+                    <img
+                      src={selectedDiacritic.images[0]}
+                      alt={selectedDiacritic.name}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <span className="text-5xl font-bold text-violet-400">
+                      {selectedDiacritic.name.match(/\((.+?)\)/)?.[1] || selectedDiacritic.name.charAt(0)}
+                    </span>
+                  )}
                 </div>
 
                 <h2 className="mb-3 text-2xl font-bold">

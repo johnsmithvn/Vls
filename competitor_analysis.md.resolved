@@ -1,0 +1,307 @@
+# 🔍 Phân tích Đối thủ: tudienngonngukyhieu.com vs. SignOS (VLS)
+
+> Phân tích chi tiết website tudienngonngukyhieu.com — từ điển NNKH Việt Nam lớn nhất hiện tại — so sánh với dự án SignOS của chúng ta.
+
+---
+
+## 1. TỔNG QUAN ĐỐI THỦ
+
+| Hạng mục | tudienngonngukyhieu.com |
+|---|---|
+| **Tên gọi** | Từ Điển Ngôn Ngữ Ký Hiệu Việt Nam |
+| **Mô tả** | Kho từ điển ngôn ngữ ký hiệu lớn nhất VN với hơn **30,000 video** |
+| **Năm thành lập** | ~2017 (bài viết sớm nhất), © 2022 |
+| **Công nghệ** | Server-rendered (có vẻ PHP/Laravel), không phải SPA |
+| **Thiết kế** | Giao diện cơ bản, Bootstrap-style, không responsive premium |
+| **SEO** | Tốt — OG tags, meta descriptions đầy đủ |
+| **Monetization** | Quảng cáo liên kết (footer spam links cá cược) |
+
+---
+
+## 2. CẤU TRÚC NAVIGATION
+
+### tudienngonngukyhieu.com (7 nav items)
+| Nav Item | URL | Mô tả |
+|---|---|---|
+| Chủ đề | `/hoc-ngon-ngu-ky-hieu-theo-chu-de` | Browse theo chủ đề (~40+ categories) |
+| Bảng chữ cái | `/bang-chu-cai-ngon-ngu-ky-hieu` | A-Z + dấu thanh, có video từng chữ |
+| Câu | `/cau/tim-kiem` | Câu thông dụng hằng ngày (~140+ câu) |
+| Từ | `/ngon-ngu-ky-hieu-theo-tu` | Tra từ đơn lẻ |
+| Bài hát | `/bai-hat/tim-kiem` | NNKH qua bài hát 🆕 |
+| Học tiếng Anh | `/hoc-tieng-anh-bang-ngon-ngu-ky-hieu` | NNKH song ngữ Anh-Việt 🆕 |
+| A-Z | `/tu-ngu-theo-bang-chu-cai` | Browse từ theo chữ cái đầu |
+
+### SignOS (VLS) — 4 nav items
+| Nav Item | URL | Status |
+|---|---|---|
+| Tra cứu | `/` | ✅ Active |
+| Từ điển | `/dictionary` | ✅ Active |
+| Chữ cái | `/alphabet` | ✅ Active |
+| Dịch câu | `/translate` | 🚧 Coming Soon |
+
+---
+
+## 3. SO SÁNH TÍNH NĂNG CHI TIẾT
+
+### 3.1. Bảng Chữ Cái
+
+| Tiêu chí | tudienngonngukyhieu.com | SignOS (VLS) | So sánh |
+|---|---|---|---|
+| **Số chữ cái** | 26 (A-Z, bao gồm F, J, W, Z) | 23 (bỏ F, J, W — đúng tiếng Việt) + Đ | 🟰 Khác tiếp cận |
+| **Dấu thanh** | 5 dấu (sắc, huyền, hỏi, ngã, nặng) | 5 dấu + 4 dấu phụ chữ (mũ, trăng, móc, gạch) | ✅ **VLS tốt hơn** |
+| **Biến thể vùng miền** | ✅ Có (HN, HCM, Huế, Miền Trung, Lâm Đồng...) | ✅ Có (Bắc, Trung, Nam, Chuẩn) | 🟰 Tương đương |
+| **Media per chữ** | Video clip cho mỗi chữ + biến thể | Hình ảnh flashcard (video chỉ chữ A) | ❌ VLS thiếu video |
+| **Hướng dẫn đánh vần** | ✅ "Bảng chữ cái ngón tay là gì?" | ✅ Có (mới thêm v1.1.3) | ✅ Tương đương |
+| **Số đếm** | Thuộc category "Số đếm" riêng | ✅ Có section Số 0-10 trên cùng trang | ✅ **VLS tiện hơn** |
+| **3D Viewer** | ❌ Không | ✅ Có (lazy-loaded, chờ .glb) | ✅ **VLS vượt trội** |
+| **Mnemonic** | ❌ Không | ✅ Mô tả cách ra ký hiệu bằng text | ✅ **VLS vượt trội** |
+
+### 3.2. Từ Điển
+
+| Tiêu chí | tudienngonngukyhieu.com | SignOS (VLS) | So sánh |
+|---|---|---|---|
+| **Số lượng từ** | **~7,400+ từ** (ID cao nhất ~9700) | ~63 từ (29 chữ cái + 34 từ vựng) | ❌ **VLS thua xa** |
+| **Số categories** | **~40+ chủ đề** phong phú | ~10 categories (seed) | ❌ VLS ít hơn |
+| **Entry types** | Từ đơn + Cụm từ (ngầm) | Từ đơn + Cụm từ + Câu (explicit) | ✅ VLS rõ ràng hơn |
+| **Tìm kiếm** | ✅ Full-text search | ✅ Debounce 300ms + auto-suggest | ✅ VLS UX tốt hơn |
+| **Biến thể vùng miền** | ✅ Nhiều (HN, HCM, Huế, Bình Dương, Lâm Đồng...) | ✅ 4 vùng (Bắc, Trung, Nam, Chuẩn) | ❌ VLS ít chi tiết hơn |
+| **Mô tả cử chỉ** | ✅ Text chi tiết từng bước | ❌ Chỉ có mnemonic ngắn cho chữ cái | ❌ VLS thiếu |
+| **Video per từ** | ✅ **Mỗi từ đều có video** | ❌ Chưa có (chờ Supabase Storage) | ❌ **Gap lớn nhất** |
+| **Browse A-Z** | ✅ Trang riêng `/tu-ngu-theo-bang-chu-cai` | ❌ Chưa có | ❌ VLS thiếu |
+| **Pagination** | ✅ Server-side, 7 pages | ✅ Client-side pagination | 🟰 Tương đương |
+
+### 3.3. Câu Thông Dụng
+
+| Tiêu chí | tudienngonngukyhieu.com | SignOS (VLS) | So sánh |
+|---|---|---|---|
+| **Số câu** | **~140+ câu** (7 trang pagination) | 0 (Translation LOCKED) | ❌ VLS chưa có |
+| **Cấu trúc câu** | Câu + link tới từng từ thành phần | Translation engine phân tích câu → tokens | ✅ VLS có engine |
+| **Video per câu** | ✅ Video dạy toàn bộ câu | ❌ Chưa có | ❌ VLS thiếu |
+| **Loại câu** | Câu hỏi, câu đề nghị, câu khẳng định | Chưa phân loại | ❌ VLS thiếu |
+
+### 3.4. Tính Năng ĐỘC QUYỀN
+
+| Tính năng | tudienngonngukyhieu.com | SignOS (VLS) |
+|---|---|---|
+| **Bài hát NNKH** | ✅ Có (trang riêng) | ❌ Không |
+| **Học tiếng Anh bằng NNKH** | ✅ Có | ❌ Không |
+| **Translation Engine** | ❌ Không | ✅ 3-Tier Resolution (built, locked) |
+| **SignTimelinePlayer** | ❌ Không | ✅ Mini Media Sequencing Engine |
+| **Translation Modes** | ❌ Không | ✅ Auto/Word-by-word/Fingerspell |
+| **3D Hand Viewer** | ❌ Không | ✅ Three.js (infrastructure ready) |
+| **Bookmark/Sổ tay** | ❌ Không | ✅ Per-user (API ready) |
+| **Auth system** | ❌ Không có user accounts | ✅ Supabase Auth + JWT |
+| **Spaced Repetition** | ❌ Không | 🔮 Phase 3 planned |
+| **AI Camera Recognition** | ❌ Không | 🔮 Phase 5 planned |
+| **Random Suggestions** | ❌ Không | ✅ "Gợi ý cho bạn" on detail page |
+| **Dark Mode** | ❌ Không | ✅ Premium dark palette |
+
+---
+
+## 4. DATA ARCHITECTURE
+
+### tudienngonngukyhieu.com
+```
+Từ ngữ (Word)
+├── ID (numeric: 1-9700+)
+├── text (tên từ)
+├── Phân loại (1 hoặc nhiều categories)
+├── Vùng miền (Hà Nội / HCM / Huế / Bình Dương / Lâm Đồng / Toàn Quốc / Miền Trung)
+├── Mô tả cử chỉ (text dài, chi tiết từng bước)
+├── Video clip (1 video per entry, embedded)
+└── Ngày tạo
+
+Câu (Sentence)
+├── ID
+├── Text câu
+├── Danh sách từ thành phần (linked)
+└── Video dạy câu
+
+Categories (~40+):
+  Ẩm thực, Các quốc gia, Câu đề nghị, Câu hỏi, Chữ cái,
+  Con vật, COVID-19, Cụm Động Từ, Danh Từ, Đại từ,
+  Địa Lý, Đồ chơi trẻ em, Đồ vật, Động Từ,
+  Gia đình, Giáo Dục, Giao Thông, Giới tính,
+  Hành động, Học hành, Khoa học, Lễ hội,
+  Liên kết từ, Màu Sắc, Nghề may, Nghề nghiệp,
+  Quân sự, Số đếm, Sức khỏe, Thể dục-Thể thao,
+  Thiên nhiên, Thời Gian, Thời tiết, Thực Vật,
+  Tiền bạc, Tin học, Tính cách, Tính Từ,
+  Trang phục, Trạng từ, Từ thông dụng, Vị trí,
+  Xã hội, Dự Án 250 Ký Hiệu Y Khoa...
+```
+
+### SignOS (VLS)
+```
+Words table
+├── id (UUID)
+├── text_vn
+├── normalized_text
+├── entry_type (word / phrase / sentence)
+├── part_of_speech
+├── difficulty_level (1-5)
+├── semantic_tags[]
+├── description
+├── status (draft → pending → approved → published)
+├── contributed_by / reviewed_by (Maker-Checker)
+└── categories[] (many-to-many)
+
+CanonicalSign
+├── variant_name
+├── region (north / central / south / standard)
+├── is_default
+└── assets[]
+
+SignAsset
+├── media_type (image / video / 3d_model)
+├── file_format
+├── url
+├── view_angle (front / side)
+├── step_order
+└── metadata (duration_ms, etc.)
+
+Categories: ~10 seed (Y tế, Gia đình, Trường học...)
+```
+
+---
+
+## 5. SO SÁNH THIẾT KẾ / UX
+
+| Tiêu chí | tudienngonngukyhieu.com | SignOS (VLS) |
+|---|---|---|
+| **Thiết kế tổng thể** | Bootstrap cơ bản, lỗi thời | Premium glassmorphism, modern |
+| **Responsive** | Có nhưng thô | ✅ Mobile-first, responsive tốt |
+| **Dark mode** | ❌ | ✅ |
+| **Animations** | ❌ Không có | ✅ Framer Motion, micro-interactions |
+| **Loading states** | ❌ Không skeleton | ✅ Skeleton loading |
+| **Typography** | System fonts | Modern Google Fonts |
+| **Quảng cáo / Spam** | ❌ Footer đầy link cá cược | ✅ Sạch, professional |
+| **SEO** | Tốt (OG tags, breadcrumb) | Cơ bản (cần cải thiện) |
+| **Tốc độ** | Chậm (server-rendered + heavy) | Nhanh (Next.js SSG/SSR) |
+
+---
+
+## 6. GAP ANALYSIS — ĐÃ CÓ / ĐANG LÀM / CHƯA CÓ
+
+### ✅ SignOS ĐÃ CÓ (vượt trội hơn đối thủ)
+1. **Translation Engine** — 3-Tier Resolution (phrase → word → fingerspell)
+2. **SignTimelinePlayer** — Media Sequencing Engine tự động phát chuỗi ký hiệu
+3. **Translation Modes** — 3 chế độ dịch (auto, từng từ, đánh vần)
+4. **3D Hand Viewer** — Infrastructure ready (Three.js + lazy-load)
+5. **User Authentication** — Supabase Auth + JWT per-user data
+6. **Bookmark/Sổ tay** — CRUD API ready
+7. **Entry Type System** — Phân biệt rõ word/phrase/sentence
+8. **Maker-Checker Pipeline** — Content review workflow (schema ready)
+9. **Premium UX** — Dark mode, animations, glassmorphism
+10. **Dấu phụ chữ cái** — 4 dấu phụ (mũ, trăng, móc, gạch ngang) — đối thủ không có
+11. **Mnemonic learning** — Mô tả gợi nhớ cho từng chữ cái
+12. **Random Suggestions** — Gợi ý từ ngẫu nhiên trên detail page
+13. **Informational Section** — Hướng dẫn đánh vần tích hợp trên trang chữ cái
+
+### 🔧 SignOS ĐANG LÀM (infrastructure sẵn, chờ data/deploy)
+1. **Media Pipeline** — Supabase Storage setup, Worker ready, chờ upload video
+2. **Seed Data** — 63 từ, cần mở rộng lên 200-300+
+3. **Deploy** — Chưa lên production (Supabase + Vercel + Railway)
+4. **PWA** — Config sẵn, chưa kích hoạt
+
+### ❌ SignOS CHƯA CÓ (cần bổ sung)
+
+> [!IMPORTANT]
+> **Gaps quan trọng nhất cần ưu tiên:**
+
+| # | Gap | Đối thủ có | Mức ưu tiên | Gợi ý |
+|---|---|---|---|---|
+| 1 | **Video cho từng từ** | ✅ 30,000+ videos | 🔴 Critical | Upload video ký hiệu lên Supabase Storage |
+| 2 | **Lượng từ vựng** | ✅ ~7,400+ từ | 🔴 Critical | Cần seed 200-500 từ cơ bản trước |
+| 3 | **Nhiều categories hơn** | ✅ 40+ chủ đề | 🟡 High | Mở rộng từ 10 → 30+ categories |
+| 4 | **Mô tả cử chỉ chi tiết** | ✅ Text mô tả từng bước | 🟡 High | Thêm field `gesture_description` vào word schema |
+| 5 | **Video cho bảng chữ cái** | ✅ Video cho mọi chữ cái | 🟡 High | Hiện chỉ có video cho chữ A |
+| 6 | **Câu thông dụng** | ✅ 140+ câu | 🟡 High | Trang /translate đang locked |
+| 7 | **Browse A-Z** | ✅ Trang riêng | 🟢 Medium | Thêm trang browse theo chữ cái đầu |
+| 8 | **Bài hát NNKH** | ✅ | 🔵 Low | Tính năng unique, thêm sau |
+| 9 | **Học tiếng Anh bằng NNKH** | ✅ | 🔵 Low | Song ngữ, Phase 3+ |
+| 10 | **Vùng miền chi tiết hơn** | ✅ (HN, HCM, Huế, BD, LĐ...) | 🟢 Medium | Mở rộng region từ 4 → 6-7 |
+
+---
+
+## 7. NHẬN XÉT CHIẾN LƯỢC
+
+### Điểm mạnh của đối thủ
+- **Content là vua** — 30,000+ video, 7,400+ từ. Đây là lợi thế **rất khó bắt kịp** nhanh.
+- **SEO tốt** — Đã index lâu, domain authority cao.
+- **Vùng miền phong phú** — Bao phủ nhiều địa phương (Huế, Bình Dương, Lâm Đồng...).
+- **Câu thông dụng** — 140+ câu với video dạy từng câu, rất thực tế.
+
+### Điểm yếu của đối thủ
+- **UX/UI lỗi thời** — Bootstrap cơ bản, không dark mode, không animation.
+- **Không có AI/Translation** — Chỉ tra từ thủ công, không dịch câu tự động.
+- **Không có hệ thống user** — Không bookmark, không lịch sử, không cá nhân hóa.
+- **Không có learning loop** — Không spaced repetition, không practice mode.
+- **Quảng cáo spam** — Footer đầy link cá cược → mất uy tín.
+- **Không có 3D/interactive** — Chỉ video 2D.
+- **Data structure đơn giản** — Không entry_type, không maker-checker.
+
+### Chiến lược cho SignOS
+
+> [!TIP]
+> **Không nên cạnh tranh về lượng content (30,000 video) ở giai đoạn đầu.** Thay vào đó, tập trung vào **chất lượng trải nghiệm** và **tính năng AI/interactive** mà đối thủ không có.
+
+1. **Phase 1 (Hiện tại)**: Hoàn thiện 200-300 từ cơ bản + video → deploy production.
+2. **Phase 2**: Unlock Translation Engine — tính năng đối thủ **hoàn toàn không có**.
+3. **Phase 3**: Learning Loop (Spaced Repetition) — biến từ "từ điển" thành "ứng dụng học".
+4. **Phase 4-5**: 3D Avatar + AI Camera — breakthrough features.
+
+**Positioning**: Không phải "từ điển lớn nhất" mà là **"ứng dụng HỌC ngôn ngữ ký hiệu thông minh nhất"**.
+
+---
+
+## 8. DANH SÁCH CATEGORIES CỦA ĐỐI THỦ (để tham khảo seed data)
+
+Dưới đây là toàn bộ ~40 categories của tudienngonngukyhieu.com, có thể dùng làm reference để mở rộng categories cho VLS:
+
+| # | Category | Slug |
+|---|---|---|
+| 1 | Ẩm thực - Món ăn | am-thuc---mon-an-25 |
+| 2 | Các quốc gia | cac-quoc-gia-48 |
+| 3 | Câu đề nghị | cau-de-nghi-50 |
+| 4 | Câu hỏi | cau-hoi-42 |
+| 5 | Chữ cái | chu-cai |
+| 6 | Con vật | con-vat |
+| 7 | COVID-19 | covid19-corona-virus-55 |
+| 8 | Cụm Động Từ | cum-dong-tu-51 |
+| 9 | Danh Từ | danh-tu-44 |
+| 10 | Đại từ | dai-tu-52 |
+| 11 | Địa Lý | dia-ly-40 |
+| 12 | Đồ chơi trẻ em | do-choi-tre-em-41 |
+| 13 | Đồ vật | do-vat-20 |
+| 14 | Động Từ | dong-tu-46 |
+| 15 | Dự Án 250 Ký Hiệu Y Khoa | du-an-250-ky-hieu-y-khoa-60 |
+| 16 | Gia đình - Quan hệ | gia-dinh---quan-he-gia-dinh-14 |
+| 17 | Giáo Dục | giao-duc-39 |
+| 18 | Giao Thông | giao-thong |
+| 19 | Giới tính | gioi-tinh-28 |
+| 20 | Hành động | hanh-dong-15 |
+| 21 | Học hành | hoc-hanh-53 |
+| 22 | Khoa học | khoa-hoc |
+| 23 | Lễ hội | le-hoi-21 |
+| 24 | Liên kết từ | lien-ket-tu-49 |
+| 25 | Màu Sắc | mau-sac-29 |
+| 26 | Nghề may - Đan | nganh-may |
+| 27 | Nghề nghiệp | nghe-nghiep-31 |
+| 28 | Quân sự | quan-su |
+| 29 | Số đếm | so-dem-17 |
+| 30 | Sức khỏe - Bộ phận cơ thể | suc-khoe---bo-phan-co-the-22 |
+| 31 | Thể dục - Thể thao | the-duc-the-thao-13 |
+| 32 | Thiên nhiên | thien-nhien-34 |
+| 33 | Thời Gian | thoi-gian-30 |
+| 34 | Thời tiết | thoi-gian-thoi-tiet-19 |
+| 35 | Thực Vật | thuc-vat-23 |
+| 36 | Tiền bạc | tien-bac-38 |
+| 37 | Tin học | tin-hoc |
+| 38 | Tính cách - Tính chất | tinh-cach-tinh-chat-27 |
+| 39 | Tính Từ | tinh-tu-45 |
+| 40 | Trang phục | trang-phuc |
+| 41 | Trạng từ | trang-tu-47 |
+| 42 | Từ thông dụng | tu-thong-dung-33 |
+| 43 | Vị trí - Nơi chốn | vi-tri-noi-chon-26 |
+| 44 | Xã hội | xa-hoi |

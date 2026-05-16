@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, Search, Hand, Languages } from "lucide-react";
+import { BookOpen, Search, Languages, Shield } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
   { href: "/", label: "Tra cứu", icon: Search },
   { href: "/dictionary", label: "Từ điển", icon: BookOpen },
   { href: "/translate", label: "Dịch câu", icon: Languages, badge: "Soon" },
+  { href: "/admin", label: "Admin", icon: Shield },
 ];
 
 export function Header() {

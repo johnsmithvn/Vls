@@ -203,11 +203,44 @@
 - [x] `PLAN.md` — Cập nhật roadmap, Supabase Storage, Phase 2 scope
 - [x] Build passed ✓ (7 routes)
 
-## 14. ✅ Dictionary Detail: Random Suggestions — DONE
+## 14. ✅ Dictionary Detail & Alphabet: UI Enhancements — DONE
 
 - [x] `apps/web/src/app/dictionary/[id]/page.tsx`: Thêm section "Gợi ý cho bạn" ở cuối trang detail
 - [x] Fetch random words từ `browseWords` API (cache 5 phút)
 - [x] Seeded Fisher-Yates shuffle (seed = wordId) → hiển thị 4 gợi ý khác nhau mỗi từ
 - [x] Card UI: icon theo entry_type, badge, difficulty stars, description (truncated)
 - [x] Tự động loại bỏ từ hiện tại khỏi danh sách gợi ý
+- [x] `apps/web/src/app/alphabet/page.tsx`: Thêm section "Bảng chữ cái ngón tay là gì?" chứa hướng dẫn đánh vần.
 - [x] Build passed ✓ (7 routes)
+
+## 15. ✅ Admin CMS + Video Integration — DONE
+
+- [x] `alembic/versions/003_add_user_role.py`: Migration thêm `role` column vào bảng `users`
+- [x] `app/modules/auth/models.py`: Thêm field `role` (owner | contributor | user)
+- [x] `app/core/security.py`: Thêm `get_owner_user` dependency (kiểm tra role owner)
+- [x] `app/modules/admin/`: Module mới (router, service, schemas) — CRUD words, categories, dashboard stats
+- [x] `app/main.py`: Đăng ký admin router tại `/api/v1/admin`
+- [x] `apps/web/src/components/shared/ui/SignMediaPlayer.tsx`: Component nhúng video Google Drive / YouTube / mp4
+- [x] `apps/web/src/lib/supabase.ts`: Supabase client cho frontend auth
+- [x] `apps/web/src/lib/admin-api.ts`: Admin API client (typed)
+- [x] `apps/web/src/app/admin/layout.tsx`: Admin layout + login form + auth guard
+- [x] `apps/web/src/app/admin/page.tsx`: Dashboard thống kê
+- [x] `apps/web/src/app/admin/words/page.tsx`: Danh sách từ vựng + search + pagination + delete
+- [x] `apps/web/src/app/admin/words/new/page.tsx`: Form tạo từ mới + biến thể vùng miền + video preview
+- [x] `apps/web/src/app/admin/words/[id]/edit/page.tsx`: Form chỉnh sửa từ (pre-fill data + update)
+- [x] `apps/web/src/components/entities/MediaRenderer.tsx`: Thêm YouTube embed support
+- [x] `apps/web/src/lib/admin-api.ts`: Thêm `getWordDetailAdmin` cho edit page
+- [x] Build passed ✓ (12 routes, bao gồm 4 admin routes)
+
+## 16. ✅ Alphabet: Name Speller (Đánh vần tên) — DONE
+
+- [x] `apps/web/src/components/features/alphabet/NameSpeller.tsx`: Component đánh vần tiếng Việt
+  - Input nhập tên/từ → phân tích Unicode NFD → tách thành chữ cái + dấu phụ + dấu thanh
+  - Flashcard carousel với ảnh từ alphabet.json
+  - Loading animation (bouncing dots)
+  - Navigation arrows + keyboard ← → + dot timeline clickable
+  - Progress bar hiển thị tiến trình
+  - Hỗ trợ đầy đủ: Â, Ă, Ê, Ô, Ơ, Ư, Đ + 5 dấu thanh
+  - Ngắt từ (space) hiển thị card riêng với hướng dẫn
+- [x] `apps/web/src/app/alphabet/page.tsx`: Tích hợp NameSpeller vào Section 5
+- [x] Build passed ✓

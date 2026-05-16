@@ -8,9 +8,11 @@ import uuid
 from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
-from app.core.exceptions import UnauthorizedException
+from app.core.dependencies import get_db
+from app.core.exceptions import ForbiddenException, UnauthorizedException
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -65,3 +67,25 @@ async def get_optional_user(
         return uuid.UUID(sub) if sub else None
     except (UnauthorizedException, ValueError):
         return None
+
+
+async def get_owner_user(
+    user_id: uuid.UUID = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> uuid.UUID:
+    """
+    Verify user has 'owner' role. Use for admin-only routes.
+    Raises ForbiddenException if not owner.
+    """
+    from sqlalchemy import select
+    from app.modules.auth.models import User
+
+    result = await db.execute(
+        select(User).where(User.id == user_id)
+    )
+    user = result.scalar_one_or_none()
+
+    if user is None or user.role != "owner":
+        raise ForbiddenException("Owner access required")
+
+    return user_id

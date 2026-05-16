@@ -6,6 +6,92 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## v1.3.0 — 2026-05-16
+
+### Added
+- **Name Speller (Đánh vần tên)**: Tính năng mới trong trang `/alphabet`. Người dùng nhập tên hoặc bất kỳ từ tiếng Việt → hệ thống phân tích thành các bước đánh vần ký hiệu tay theo đúng quy tắc VSL.
+  - Phân tích Unicode NFD: tách chữ cái gốc, dấu phụ (^, ˘, móc), dấu thanh (sắc, huyền, hỏi, ngã, nặng).
+  - Flashcard carousel: hiển thị ảnh bàn tay từ `alphabet.json`, điều hướng bằng mũi tên hoặc phím ← →.
+  - Loading animation, dot timeline, progress bar.
+  - Hiển thị "Ngắt từ" khi có khoảng trắng giữa các từ.
+
+### Files Added
+- `apps/web/src/components/features/alphabet/NameSpeller.tsx`
+
+### Files Modified
+- `apps/web/src/app/alphabet/page.tsx` — Tích hợp NameSpeller vào Section 5.
+
+---
+
+## v1.2.0 — 2026-05-16
+
+### Added
+- **Admin CMS**: Trang quản trị mới tại `/admin` cho phép Owner quản lý nội dung từ điển.
+  - Dashboard thống kê tổng số từ, cụm từ, câu, chủ đề, video, hình ảnh.
+  - CRUD từ vựng (tạo, sửa, xóa) với form chi tiết.
+  - Quản lý biến thể vùng miền (Bắc/Trung/Nam) cho mỗi từ.
+  - Quản lý chủ đề (categories) — CRUD đầy đủ.
+- **SignMediaPlayer**: Component dùng chung nhúng video từ Google Drive, YouTube, hoặc direct URL. Tự nhận diện và chuyển đổi link.
+- **Video Preview**: Preview video trực tiếp trong form Admin khi dán link Google Drive/YouTube.
+- **RBAC**: Hệ thống phân quyền theo role (`owner`/`contributor`/`user`). Chỉ owner truy cập Admin.
+- **Supabase Auth Integration**: Frontend kết nối Supabase Auth cho đăng nhập Admin.
+- **YouTube Support**: `MediaRenderer` component hỗ trợ nhúng video YouTube trong trang dictionary detail.
+
+### Backend (API)
+- `POST /api/v1/admin/words` — Tạo từ mới.
+- `PUT /api/v1/admin/words/{id}` — Cập nhật từ.
+- `DELETE /api/v1/admin/words/{id}` — Xóa từ.
+- `GET /api/v1/admin/dashboard` — Thống kê Dashboard.
+- `GET /api/v1/admin/categories` — Danh sách chủ đề.
+- `POST /api/v1/admin/categories` — Tạo chủ đề mới.
+
+### Database
+- Migration `003_add_user_role`: Thêm column `role` vào bảng `users`.
+
+### Files Added
+- `apps/api/alembic/versions/003_add_user_role.py`
+- `apps/api/app/modules/admin/` (router, service, schemas)
+- `apps/web/src/components/shared/ui/SignMediaPlayer.tsx`
+- `apps/web/src/lib/supabase.ts`
+- `apps/web/src/lib/admin-api.ts`
+- `apps/web/src/app/admin/` (layout, dashboard, words list, word create, word edit)
+
+### Files Modified
+- `apps/web/src/components/entities/MediaRenderer.tsx` — Thêm YouTube embed support
+
+---
+
+## v1.1.3 — 2026-05-16
+
+### Added
+- **Alphabet Info Section**: Added a new informational section "Bảng chữ cái ngón tay là gì?" at the bottom of the `/alphabet` page. It explains when to use fingerspelling, rules for diacritics, and how to indicate spacing between words.
+
+### Files Modified
+- `apps/web/src/app/alphabet/page.tsx` — Added information section.
+
+---
+
+## v1.1.2 — 2026-05-16
+
+### Fixed
+- **Flashcard Images**: Regenerated images for letters A and E to correctly match Vietnamese Sign Language hand poses based on reference materials.
+
+### Files Modified
+- `apps/web/public/images/alphabet/flashcards/flashcard_a.png`
+- `apps/web/public/images/alphabet/flashcards/flashcard_e.png`
+
+---
+
+## v1.1.1 — 2026-05-16
+
+### Fixed
+- **Tone Marks Images**: Fixed broken images for tone marks in the alphabet grid and modal by implementing a text-based symbol fallback when `images` array is empty.
+
+### Files Modified
+- `apps/web/src/app/alphabet/page.tsx` — Added fallback rendering logic.
+
+---
+
 ## v1.1.0 — 2026-05-16
 
 ### Added

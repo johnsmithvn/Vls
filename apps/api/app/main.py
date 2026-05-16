@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.exceptions import AppException, app_exception_handler, generic_exception_handler
+from app.modules.admin.router import router as admin_router
 from app.modules.auth.router import router as auth_router
 from app.modules.dictionary.router import router as dictionary_router
 from app.modules.media.router import router as media_router
@@ -35,6 +36,7 @@ app.add_middleware(
 )
 
 # ── Routers ─────────────────────────────────────────────────
+app.include_router(admin_router, prefix="/api/v1/admin", tags=["admin"])
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(dictionary_router, prefix="/api/v1/dictionary", tags=["dictionary"])
 app.include_router(media_router, prefix="/api/v1/media", tags=["media"])

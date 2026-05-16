@@ -34,6 +34,29 @@ function isDriveUrl(url: string): boolean {
 }
 
 /**
+ * Check if a URL is a YouTube link.
+ */
+function isYouTubeUrl(url: string): boolean {
+  return url.includes("youtube.com") || url.includes("youtu.be");
+}
+
+/**
+ * Extract YouTube video ID from various URL formats.
+ */
+function extractYouTubeId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+/**
  * Polymorphic media renderer.
  * Auto-detects media_type and renders the appropriate HTML element.
  * Supports: image, video (self-hosted + Google Drive embed), 3d_model.
@@ -53,6 +76,26 @@ export function MediaRenderer({ asset, className = "" }: MediaRendererProps) {
       );
 
     case "video": {
+      // YouTube embed
+      if (isYouTubeUrl(asset.url)) {
+        const videoId = extractYouTubeId(asset.url);
+        if (videoId) {
+          return (
+            <div className={`relative overflow-hidden rounded-xl ${className}`}>
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}`}
+                className="h-full w-full aspect-video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+                title="Video ký hiệu ngôn ngữ ký hiệu"
+                style={{ border: "none" }}
+              />
+            </div>
+          );
+        }
+      }
+
       // Google Drive embed
       if (isDriveUrl(asset.url)) {
         const driveId = extractDriveId(asset.url);

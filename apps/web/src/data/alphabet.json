@@ -55,7 +55,8 @@
       "letter": "D",
       "mnemonic": "Ngón trỏ thẳng, còn lại nắm",
       "images": [
-        "/images/alphabet/flashcards/flashcard_d.png"
+        "/images/alphabet/flashcards/flashcard_d_front.png",
+        "/images/alphabet/flashcards/flashcard_d_side.png"
       ],
       "is_extended": false,
       "related_letters": [
@@ -66,7 +67,8 @@
       "letter": "Đ",
       "mnemonic": "Giống D, ngón trỏ hơi cong",
       "images": [
-        "/images/alphabet/flashcards/flashcard_dd.png"
+        "/images/alphabet/flashcards/flashcard_dd_front.png",
+        "/images/alphabet/flashcards/flashcard_dd_side.png"
       ],
       "is_extended": false,
       "related_letters": [
